@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as a Worker | JobEase</title>
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-dark: #ea580c;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --surface: #ffffff;
+      --background: #fff8f1;
+      --success: #15803d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: var(--background);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .page {
+      display: grid;
+      min-height: 100vh;
+      grid-template-columns: minmax(280px, 0.9fr) minmax(480px, 1.4fr);
+    }
+
+    .intro {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 42px clamp(28px, 5vw, 72px);
+      color: #fff;
+      background: linear-gradient(145deg, #172033 0%, #24324b 100%);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 11px;
+      color: #fff;
+      background: var(--primary);
+      font-size: 20px;
+    }
+
+    .intro-copy {
+      max-width: 430px;
+      margin: 54px 0;
+    }
+
+    .intro h1 {
+      margin: 0 0 16px;
+      font-size: clamp(38px, 5vw, 62px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .intro p {
+      margin: 0;
+      color: #d9dfeb;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .benefits {
+      display: grid;
+      gap: 14px;
+      margin-top: 34px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .benefits li {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #eef2f8;
+      font-size: 15px;
+    }
+
+    .check {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .intro-footer {
+      color: #b5c0d2;
+      font-size: 13px;
+    }
+
+    .content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 42px clamp(22px, 5vw, 84px);
+    }
+
+    .form-wrap {
+      width: min(100%, 760px);
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .back:hover {
+      color: var(--primary-dark);
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: clamp(29px, 4vw, 38px);
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 17px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: 0;
+      padding: 13px 14px;
+      color: var(--ink);
+      background: var(--surface);
+      font: inherit;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    }
+
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .terms input {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 14px 22px;
+      color: #fff;
+      background: var(--primary);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 800;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .login {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .login a {
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .success {
+      display: none;
+      padding: 28px;
+      border: 1px solid #bbf7d0;
+      border-radius: 15px;
+      color: var(--success);
+      background: #f0fdf4;
+      line-height: 1.6;
+    }
+
+    .success h3 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .success a {
+      display: inline-block;
+      margin-top: 14px;
+      border-radius: 9px;
+      padding: 11px 16px;
+      color: #fff;
+      background: var(--success);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    @media (max-width: 880px) {
+      .page {
+        display: block;
+      }
+
+      .intro {
+        min-height: auto;
+        padding: 28px 24px 34px;
+      }
+
+      .intro-copy {
+        margin: 42px 0 0;
+      }
+
+      .intro h1 {
+        font-size: 40px;
+      }
+
+      .intro-footer {
+        display: none;
+      }
+
+      .content {
+        padding: 34px 22px 48px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <a class="brand" href="index.html" aria-label="JobEase home">
+        <span class="brand-mark">J</span>
+        <span>JobEase</span>
+      </a>
+
+      <div class="intro-copy">
+        <h1>Find work that works for you.</h1>
+        <p>Create your worker profile and connect with customers looking for trusted local professionals.</p>
+        <ul class="benefits">
+          <li><span class="check">✓</span>Get discovered by nearby customers</li>
+          <li><span class="check">✓</span>Choose your skills and service location</li>
+          <li><span class="check">✓</span>Build your profile in just a few minutes</li>
+        </ul>
+      </div>
+
+      <span class="intro-footer">Trusted services. Better opportunities.</span>
+    </section>
+
+    <section class="content">
+      <div class="form-wrap">
+        <a class="back" href="index.html">← Back to home</a>
+
+        <div id="registration-content">
+          <h2>Register as a worker</h2>
+          <p class="subtitle">Tell us a little about yourself to start receiving job opportunities.</p>
+
+          <form id="worker-registration-form">
+            <div class="grid">
+              <label>
+                Full name
+                <input type="text" name="fullName" placeholder="Enter your full name" autocomplete="name" required>
+              </label>
+              <label>
+                Phone number
+                <input type="tel" name="phone" placeholder="Enter your phone number" autocomplete="tel" pattern="[0-9+\-\s]{8,15}" required>
+              </label>
+            </div>
+
+            <div class="grid">
+              <label>
+                Email address
+                <input type="email" name="email" placeholder="Enter your email" autocomplete="email" required>
+              </label>
+              <label>
+                Service category
+                <select name="category" required>
+                  <option value="">Select your profession</option>
+                  <option>Electrician</option>
+                  <option>Plumber</option>
+                  <option>Carpenter</option>
+                  <option>Painter</option>
+                  <option>Cleaner</option>
+                  <option>Appliance Repair</option>
+                  <option>Automobile Services</option>
+                  <option>Labour Jobs</option>
+                  <option>Delivery Jobs</option>
+                  <option>Driver Services</option>
+                  <option>Beauty & Wellness</option>
+                  <option>Education</option>
+                  <option>IT & Freelancing</option>
+                  <option>Part-Time Jobs</option>
+                  <option>Work From Home</option>
+                  <option>Event Services</option>
+                  <option>Pet Services</option>
+                  <option>Healthcare Support</option>
+                  <option>Business Support</option>
+                  <option>Professional Jobs</option>
+                  <option>Social Companion Services</option>
+                  <option>International Jobs</option>
+                  <option>Training & Certification</option>
+                  <option>Emergency Services</option>
+                  <option>Future & Smart Services</option>
+                  <option>Security & Investigation</option>
+                  <option>Security Services</option>
+                  <option>Senior Citizen Services</option>
+                  <option>Women Support Services</option>
+                  <option>Property Services</option>
+                  <option>Agriculture Services</option>
+                  <option>Religious & Cultural Services</option>
+                  <option>Documentation Services</option>
+                  <option>Creative Services</option>
+                  <option>Rental Services</option>
+                  <option>Education & Career</option>
+                  <option>Healthcare & Wellness</option>
+                  <option>Household Support</option>
+                  <option>Marketplace</option>
+                  <option>Other</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="grid">
+              <label>
+                Experience
+                <select name="experience" required>
+                  <option value="">Select experience</option>
+                  <option>Less than 1 year</option>
+                  <option>1 - 3 years</option>
+                  <option>3 - 5 years</option>
+                  <option>More than 5 years</option>
+                </select>
+              </label>
+              <label>
+                City
+                <input type="text" name="city" placeholder="Enter your city" autocomplete="address-level2" required>
+              </label>
+            </div>
+
+            <label>
+              About your work
+              <textarea name="description" placeholder="Briefly describe your skills and the services you provide" required></textarea>
+            </label>
+
+            <div class="grid">
+              <label>
+                Create password
+                <input type="password" name="password" placeholder="Minimum 6 characters" autocomplete="new-password" minlength="6" required>
+              </label>
+              <label>
+                Confirm password
+                <input type="password" name="confirmPassword" placeholder="Enter password again" autocomplete="new-password" minlength="6" required>
+              </label>
+            </div>
+
+            <label class="terms">
+              <input type="checkbox" name="terms" required>
+              <span>I agree to the Terms of Service and Privacy Policy.</span>
+            </label>
+
+            <button type="submit">Create worker account</button>
+            <p class="login">Already have an account? <a href="login.html">Log in</a></p>
+          </form>
+        </div>
+
+        <div class="success" id="registration-success" role="status">
+          <h3>Registration successful</h3>
+          <div>Your worker profile has been created. You can now start connecting with customers.</div>
+          <a href="login.html">Continue to worker login</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("worker-registration-form");
+    const content = document.getElementById("registration-content");
+    const success = document.getElementById("registration-success");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const data = new FormData(form);
+      if (data.get("password") !== data.get("confirmPassword")) {
+        form.elements.confirmPassword.setCustomValidity("Passwords do not match.");
+        form.elements.confirmPassword.reportValidity();
+        return;
+      }
+
+      form.elements.confirmPassword.setCustomValidity("");
+      content.style.display = "none";
+      success.style.display = "block";
+    });
+
+    form.elements.confirmPassword.addEventListener("input", () => {
+      form.elements.confirmPassword.setCustomValidity("");
+    });
+  </script>
+</body>
+</html>
