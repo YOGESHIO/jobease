@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
+:root{--primary:#c6f36b!important;--primary-dark:#aee453!important;--ink:#081b20!important;--muted:#64757a!important;--line:rgba(8,27,32,.12)!important;--background:#f5f7f2!important;--bg:#f5f7f2!important;--surface:#fff!important}
+body{color:#081b20!important;background:#f5f7f2!important;font-family:"DM Sans",Arial,sans-serif!important}
+h1,h2,h3,.brand{font-family:"Manrope",Arial,sans-serif!important;letter-spacing:-1px}
+header{background:#092a30!important}
+.brand-mark{color:#092a30!important;background:#c6f36b!important}
+button,.submit,.primary-action{border-color:#c6f36b!important;color:#092a30!important;background:#c6f36b!important}
+button:hover,.submit:hover,.primary-action:hover{background:#aee453!important}
+input:focus,select:focus,textarea:focus{border-color:#56a991!important;box-shadow:0 0 0 4px rgba(86,169,145,.14)!important}
+.intro{background:linear-gradient(145deg,#071b20,#0b3d43)!important}
+.intro p{color:rgba(255,255,255,.68)!important}
+.check{color:#092a30!important;background:#c6f36b!important}
+.card,.panel{border-color:rgba(8,27,32,.1)!important;border-radius:14px!important;box-shadow:0 7px 20px rgba(8,27,32,.045)!important}
+.tag{color:#176e68!important;background:#e7f6d0!important}
+.money{color:#158073!important}
+.price-box{border-color:#d6ed9e!important;color:#41650a!important;background:#f5ffe2!important}
+.action{color:#fff!important;background:#0b3d43!important}.danger{color:#fff!important;background:#b42318!important}
+.modal-head{background:#092a30!important}
+.comments li{border-left-color:#ff6b35!important;background:#fff4ef!important}

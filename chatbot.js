@@ -1,0 +1,34 @@
+(function () {
+  const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "chatbot.css"; document.head.appendChild(css);
+  const role = localStorage.getItem("jobeaseRole") || "guest";
+  const profile = { guest:["there","Visitor"],customer:["Customer","Customer support"],worker:["Professional","Worker support"],admin:["Admin","Admin support"] }[role];
+  let lastTopic = "";
+  document.body.insertAdjacentHTML("beforeend",`<button class="ai-launcher" id="ai-launcher" type="button" aria-label="Open JobEase assistant">✦</button><section class="ai-panel" id="ai-panel"><header class="ai-head"><div class="ai-title"><span class="ai-bot-icon">J</span><div><b>Jiya · JobEase Assistant</b><small>${profile[1]} · Online now</small></div></div><button class="ai-close" id="ai-close" type="button">×</button></header><div class="ai-messages" id="ai-messages"></div><div class="ai-quick" id="ai-quick"></div><form class="ai-form" id="ai-form"><input id="ai-input" autocomplete="off" placeholder="Type your question..."><button class="ai-send" type="submit">➜</button></form></section>`);
+  const panel=document.getElementById("ai-panel"),messages=document.getElementById("ai-messages"),input=document.getElementById("ai-input"),quick=document.getElementById("ai-quick");
+  const choices={guest:["How do I book?","Quick booking","Join as worker","Login help"],customer:["Post a job","Quick booking","My posted jobs","Service charges"],worker:["My earnings","Commission","Job requests","Update profile"],admin:["Worker list","Worker ratings","Delete worker","Platform safety"]};
+  const time=()=>new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  function add(text,type){messages.insertAdjacentHTML("beforeend",`<div class="ai-message-wrap ${type}"><div class="ai-message ${type}">${text}</div><small class="ai-time">${time()}</small></div>`);messages.scrollTop=messages.scrollHeight}
+  function typing(){messages.insertAdjacentHTML("beforeend",`<div class="ai-message-wrap bot" id="ai-typing"><div class="ai-message bot ai-typing"><i></i><i></i><i></i></div></div>`);messages.scrollTop=messages.scrollHeight}
+  const pick=items=>items[Math.floor(Math.random()*items.length)];
+  const jobs=()=>JSON.parse(localStorage.getItem("jobeaseCustomerJobs")||"[]");
+  function answer(q){const t=q.toLowerCase();
+    if(["hello","hi","hey","namaste"].some(w=>t.includes(w)))return pick([`Namaste ${profile[0]}. How can I help you today?`,`Hello ${profile[0]}. I am here to help. What do you need assistance with?`]);
+    if(t.includes("my posted")||t.includes("my job")||t.includes("status")){lastTopic="jobs";const j=jobs();if(role!=="customer")return"Posted-job tracking is available after customer login. Would you like help with login?";return j.length?`You currently have ${j.length} posted job${j.length>1?"s":""}. Your latest request is "${j[0].title}" with status: ${j[0].status}.`:"You have not posted a job yet. Use the Post a Job form in your dashboard and I can help you choose the right category."}
+    if(t.includes("quick")||t.includes("urgent")||t.includes("1-2")){lastTopic="quick";return"Quick Booking is best for urgent help within 1-2 hours. Choose a service and location, review the starting charge, then post. We show the worker search, assigned professional, ETA, and arrival OTP."}
+    if(t.includes("otp")||t.includes("arriv"))return"Share the OTP only after the assigned worker reaches your location. OTP confirmation protects your booking and starts the work officially.";
+    if(t.includes("price")||t.includes("rate")||t.includes("charge")||t.includes("cost"))return"Starting charges appear before posting. Examples: Electrician ₹399, Plumber ₹399, House Cleaning ₹699, AC Repair ₹599. Any extra work should always be confirmed first.";
+    if(t.includes("earning")||t.includes("income"))return role==="worker"?"Your dashboard shows total earnings, platform commission, and net earnings after deduction, plus each job separately.":"Workers can review earnings, commission, and each payment after worker login.";
+    if(t.includes("commission"))return"The demo worker dashboard shows a 10% platform commission for each job, with the final net earning listed clearly.";
+    if(t.includes("register")||t.includes("join")||t.includes("profile"))return"Choose Join as Worker in the top menu. Add contact details, category, experience, city, and a short description. After registration, continue to worker login.";
+    if(t.includes("book")||t.includes("post"))return"Log in as a customer and open Post a Job. Select a service, enter location and budget, describe the issue, and submit. We assign a suitable professional automatically.";
+    if(t.includes("login")||t.includes("password")||t.includes("sign in"))return"Open Login and choose Customer, Worker, or Admin. This demo displays static credentials below the form for easy testing.";
+    if(t.includes("worker list")||t.includes("rating")||t.includes("delete worker"))return role==="admin"?"Your admin dashboard has Registered Workers. Use Details to review ratings and comments, or Delete to remove an account after confirmation.":"Worker management and rating details are protected inside admin access.";
+    if(t.includes("safe")||t.includes("kyc")||t.includes("verify"))return"JobEase uses KYC verification, booking records, ratings, arrival OTP checks, and extra review for regulated services such as security and healthcare.";
+    if(t.includes("yes")&&lastTopic==="quick")return"Great. Log in as a customer, scroll to Quick Booking, and select your urgent service. The estimated charge appears before you post.";
+    return"I did not fully understand that yet. I can guide you with booking, urgent service, OTP, prices, login, worker registration, earnings, commission, and safety. Could you add a little more detail?";
+  }
+  function send(text){if(!text.trim())return;add(text.trim(),"user");input.value="";typing();setTimeout(()=>{document.getElementById("ai-typing").remove();add(answer(text),"bot")},650+Math.random()*450)}
+  quick.innerHTML=choices[role].map(label=>`<button type="button">${label}</button>`).join("");
+  document.getElementById("ai-launcher").addEventListener("click",()=>{panel.classList.toggle("open");if(panel.classList.contains("open"))input.focus()});document.getElementById("ai-close").addEventListener("click",()=>panel.classList.remove("open"));document.getElementById("ai-form").addEventListener("submit",e=>{e.preventDefault();send(input.value)});document.querySelectorAll("#ai-quick button").forEach(button=>button.addEventListener("click",()=>send(button.textContent)));
+  add(`Namaste ${profile[0]}. I am Jiya, your JobEase support assistant. I can guide you with ${role==="worker"?"jobs, earnings, commission, and your profile":role==="admin"?"worker management, ratings, and safety":"service booking, urgent help, prices, and worker registration"}. How may I help?`,"bot");
+})();

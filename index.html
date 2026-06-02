@@ -1,281 +1,124 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HireMate | Trusted Local Services</title>
-    <meta
-      name="description"
-      content="HireMate helps customers book trusted local workers for everyday services."
-    >
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="HireMate home">
-        <span class="brand-mark">H</span>
-        <span>HireMate</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#services">Services</a>
-        <a href="#estimate">Estimate</a>
-        <a href="#workers">For Workers</a>
-      </nav>
-      <a class="header-button" href="#services">Book now</a>
-    </header>
-
-    <main id="top">
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Trusted local professionals</p>
-          <h1>Everyday services, one reliable mate away.</h1>
-          <p class="hero-text">
-            Book verified plumbers, electricians, cleaners, drivers, carpenters,
-            painters, and technicians near you.
-          </p>
-          <div class="hero-search">
-            <input id="heroSearch" type="search" placeholder="Search a service">
-            <a class="primary-button" href="#services">Find help</a>
-          </div>
-          <div class="hero-links">
-            <a class="primary-button" href="#services">Explore services</a>
-            <a class="secondary-button" href="#workers">Become a worker</a>
-          </div>
-        </div>
-        <div class="hero-image">
-          <img src="assets/jobease-services-hero.png" alt="Local service professionals ready to help">
-        </div>
-      </section>
-
-      <section class="stats" aria-label="HireMate highlights">
-        <div><strong>12+</strong><span>popular services</span></div>
-        <div><strong>Verified</strong><span>worker profiles</span></div>
-        <div><strong>Clear</strong><span>price estimates</span></div>
-        <div><strong>Fast</strong><span>local bookings</span></div>
-      </section>
-
-      <section class="section-heading" id="services">
-        <p class="eyebrow">Our services</p>
-        <h2>What do you need help with?</h2>
-      </section>
-
-      <section class="service-toolbar">
-        <input id="serviceSearch" type="search" placeholder="Search plumber, cleaner, AC repair...">
-      </section>
-
-      <section class="services-grid" aria-live="polite">
-        <article class="service-card" data-keywords="plumber plumbing leak pipe bathroom">
-          <span class="service-icon">PL</span>
-          <h3>Plumber</h3>
-          <p>Leaks, taps, pipes, and bathroom fittings.</p>
-          <div><strong>From ₹199</strong><span>★ 4.8</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="electrician wiring fan light switch">
-          <span class="service-icon">EL</span>
-          <h3>Electrician</h3>
-          <p>Wiring, switches, fans, and power checks.</p>
-          <div><strong>From ₹199</strong><span>★ 4.9</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="cleaner cleaning home deep kitchen">
-          <span class="service-icon">CL</span>
-          <h3>Cleaner</h3>
-          <p>Regular and deep home cleaning services.</p>
-          <div><strong>From ₹149</strong><span>★ 4.7</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="driver car airport travel">
-          <span class="service-icon">DR</span>
-          <h3>Driver</h3>
-          <p>City travel, airport pickup, and daily drivers.</p>
-          <div><strong>From ₹299</strong><span>★ 4.6</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="carpenter wood furniture repair">
-          <span class="service-icon">CP</span>
-          <h3>Carpenter</h3>
-          <p>Furniture assembly, fixtures, and repairs.</p>
-          <div><strong>From ₹299</strong><span>★ 4.8</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="painter painting walls interior">
-          <span class="service-icon">PT</span>
-          <h3>Painter</h3>
-          <p>Wall painting, touchups, and waterproofing.</p>
-          <div><strong>From ₹499</strong><span>★ 4.7</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="labour loading shifting construction">
-          <span class="service-icon">LB</span>
-          <h3>Labour</h3>
-          <p>Loading, shifting, and daily work support.</p>
-          <div><strong>From ₹499/day</strong><span>★ 4.5</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-        <article class="service-card" data-keywords="ac repair service cooling">
-          <span class="service-icon">AC</span>
-          <h3>AC Repair</h3>
-          <p>Servicing, cooling issues, and installation.</p>
-          <div><strong>From ₹499</strong><span>★ 4.8</span></div>
-          <a href="#estimate">Book now</a>
-        </article>
-      </section>
-
-      <section class="estimate-section" id="estimate">
-        <div>
-          <p class="eyebrow">Quick estimate</p>
-          <h2>Know the price before booking</h2>
-          <p>Choose a service and work duration to get a simple starting estimate.</p>
-        </div>
-        <form class="estimate-panel">
-          <label>
-            Service
-            <select id="calcService">
-              <option value="199" data-rate="299">Plumber</option>
-              <option value="199" data-rate="349">Electrician</option>
-              <option value="149" data-rate="199">Cleaner</option>
-              <option value="299" data-rate="499">Driver</option>
-              <option value="299" data-rate="349">Carpenter</option>
-              <option value="499" data-rate="399">AC Repair</option>
-            </select>
-          </label>
-          <label>
-            Hours
-            <input id="calcHours" type="number" min="1" max="12" value="1">
-          </label>
-          <label>
-            Urgency
-            <select id="calcUrgency">
-              <option value="1">Standard</option>
-              <option value="1.2">Same day +20%</option>
-              <option value="1.4">Emergency +40%</option>
-            </select>
-          </label>
-          <div class="estimate-total">
-            <span>Estimated total</span>
-            <strong id="finalTotal">₹548</strong>
-          </div>
-          <a class="primary-button full-button" href="mailto:bookings@hiremate.example">Request booking</a>
-        </form>
-      </section>
-
-      <section class="worker-banner" id="workers">
-        <div>
-          <p class="eyebrow">Work with HireMate</p>
-          <h2>Skilled worker? Find more jobs near you.</h2>
-          <p>Create your profile, select your skills, and start receiving local job requests.</p>
-        </div>
-        <a class="primary-button" href="mailto:workers@hiremate.example">Register as worker</a>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <strong>HireMate</strong>
-      <span>Trusted local services for everyday needs.</span>
-    </footer>
-
-    <script src="script.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const workerRegistrationLink = Array.from(
-        document.querySelectorAll("a, button")
-      ).find((element) =>
-        element.textContent.trim().toLowerCase().includes("register as worker")
-      );
-
-      if (!workerRegistrationLink) {
-        return;
-      }
-
-      if (workerRegistrationLink.tagName === "A") {
-        workerRegistrationLink.setAttribute("href", "register-worker.html");
-        return;
-      }
-
-      workerRegistrationLink.addEventListener("click", () => {
-        window.location.href = "register-worker.html";
-      });
-    });
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const loginLink = Array.from(
-        document.querySelectorAll("a, button")
-      ).find((element) =>
-        element.textContent.trim().toLowerCase().includes("login") ||
-        element.textContent.trim().toLowerCase().includes("log in")
-      );
-
-      if (!loginLink) {
-        return;
-      }
-
-      if (loginLink.tagName === "A") {
-        loginLink.setAttribute("href", "login.html");
-        return;
-      }
-
-      loginLink.addEventListener("click", () => {
-        window.location.href = "login.html";
-      });
-    });
-  </script>
-  <a
-    id="login-action"
-    href="login.html"
-    aria-label="Log in to JobEase"
-    style="display:inline-flex;align-items:center;justify-content:center;margin-left:12px;padding:11px 19px;border-radius:9px;color:#fff;background:#f97316;font-weight:800;text-decoration:none;"
-  >Login</a>
-  <section id="expanded-services" style="padding:64px 24px;background:#f8fafc;">
-    <div style="width:min(100%,1160px);margin:auto;">
-      <p style="margin:0 0 8px;color:#ea580c;font-size:13px;font-weight:800;text-transform:uppercase;">Explore JobEase</p>
-      <h2 style="margin:0 0 10px;color:#172033;font-size:clamp(30px,5vw,44px);letter-spacing:-1px;">Services, jobs and opportunities</h2>
-      <p style="margin:0 0 22px;color:#667085;line-height:1.6;">Browse categories, check starting rates, and book the support you need.</p>
-      <input id="home-service-search" type="search" placeholder="Search plumber, tutor, delivery, rental..." style="width:100%;padding:14px 15px;border:1px solid #e5e7eb;border-radius:9px;outline:0;font:inherit;">
-      <div id="home-service-tabs" style="display:flex;gap:8px;margin:17px 0;overflow-x:auto;padding-bottom:4px;"></div>
-      <div id="home-service-grid" style="display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));"></div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="JobEase connects customers, workers, services and opportunities on one trusted platform.">
+  <title>JobEase | Work, Services & Opportunities</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark">J</span><span>Job<span>Ease</span></span></a>
+    <nav class="desktop-nav">
+      <a href="#services">Services</a><a href="#opportunities">Jobs</a><a href="#quick">Quick booking</a><a href="#safety">Safety</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="nav-worker" href="register-worker.html">Join as worker</a>
+      <a class="button button-small" href="login.html">Login <span>↗</span></a>
     </div>
-  </section>
-  <script>
-    const loginAction = document.getElementById("login-action");
-    const bookingAction = Array.from(document.querySelectorAll("a, button"))
-      .find((element) =>
-        element !== loginAction &&
-        element.textContent.trim().toLowerCase().includes("book")
-      );
+  </header>
 
-    if (bookingAction) {
-      bookingAction.insertAdjacentElement("afterend", loginAction);
-    }
+  <main>
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> India's work & services network</p>
+        <h1>One platform.<br><em>Endless</em> possibilities.</h1>
+        <p class="hero-text">From an urgent home repair to your next career move, connect with verified professionals and opportunities built around real life.</p>
+        <div class="hero-actions">
+          <a class="button" href="login.html">Book a service <span>↗</span></a>
+          <a class="button button-ghost" href="#services">Explore categories <span>↓</span></a>
+        </div>
+        <div class="hero-proof">
+          <div class="avatars"><i></i><i></i><i></i><i></i></div>
+          <div><strong>4.9 <b>★</b></strong><span>Trusted by 25,000+ users</span></div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img src="assets/jobease-services-hero.png" alt="JobEase skilled professionals">
+        <div class="floating-card verified"><span class="float-icon">✓</span><div><strong>Verified workers</strong><small>KYC & skill checked</small></div></div>
+        <div class="floating-card assignment"><span class="float-icon bolt">ϟ</span><div><strong>Quick assignment</strong><small>Nearby help in 1-2 hours</small></div></div>
+      </div>
+    </section>
 
-    const homeCatalog = {
-      "Home Services": ["Maid|299","House Cleaning|699","Deep Cleaning|1499","Bathroom Cleaning|399","Kitchen Cleaning|599","Sofa Cleaning|499","Carpet Cleaning|449","Office Cleaning|999"],
-      "Repair Services": ["Plumber|399","Electrician|399","Carpenter|499","Painter|599","Welder|599","Mason|549","Tile Worker|599","POP Worker|649"],
-      "Appliance Repair": ["AC Repair|599","Refrigerator Repair|499","Washing Machine Repair|499","TV Repair|449","Microwave Repair|449","Water Purifier Repair|399","Geyser Repair|449"],
-      "Automobile": ["Bike Repair|349","Bike Washing|199","Puncture Repair|149","Car Repair|699","Car Washing|399","Car Detailing|1499","Towing Service|999","Battery Jump Start|449"],
-      "Jobs": ["Construction Labour|699","Factory Labour|699","Warehouse Worker|699","Food Delivery|499","Personal Driver|799","Home Tutor|499","Data Entry|399","Store Helper|599","Customer Support|599"],
-      "Lifestyle": ["Beautician|599","Makeup Artist|999","Yoga Trainer|499","Photographer|1499","DJ|2999","Dog Walker|299","Pet Grooming|599","Pandit Booking|799"],
-      "Support": ["Home Nurse|999","Caretaker|799","Elder Care|799","Babysitter|699","Ambulance Booking|999","Locksmith|449","Female Driver|899","Daily Check-In Service|299"],
-      "Professional": ["Website Developer|2999","Graphic Designer|999","Accountant|999","Security Guard|799","Property Inspection|999","Passport Assistance|499","Resume Writing|499","Career Counseling|799"],
-      "Rental & Farm": ["Vehicle Rent|999","Equipment Rent|799","Generator Rent|999","Camera Rent|799","Tractor Rental|1499","Harvester Rental|2999","Farm Labour|699","Tools|299"],
-      "Future & Training": ["AI Assistant Setup|1499","AI Content Creation|999","AI Training|1499","CCTV Installation|999","Smart Device Setup|699","Home Automation|1999","Skill Training|999","Safety Certification|799"]
-    };
-    let homeActiveCategory = "Home Services";
-    function renderHomeServices() {
-      const term = document.getElementById("home-service-search").value.trim().toLowerCase();
-      document.getElementById("home-service-tabs").innerHTML = Object.keys(homeCatalog).map((category) =>
-        `<button type="button" data-category="${category}" style="flex:0 0 auto;border:1px solid ${category === homeActiveCategory ? "#f97316" : "#e5e7eb"};border-radius:20px;padding:9px 13px;color:${category === homeActiveCategory ? "#fff" : "#475467"};background:${category === homeActiveCategory ? "#f97316" : "#fff"};cursor:pointer;font-weight:800;">${category}</button>`
-      ).join("");
-      document.querySelectorAll("#home-service-tabs button").forEach((button) => button.addEventListener("click", () => { homeActiveCategory = button.dataset.category; renderHomeServices(); }));
-      const items = homeCatalog[homeActiveCategory].filter((item) => item.toLowerCase().includes(term));
-      document.getElementById("home-service-grid").innerHTML = items.map((item) => {
-        const [name, rate] = item.split("|");
-        return `<article style="padding:17px;border:1px solid #e5e7eb;border-radius:11px;background:#fff;"><h3 style="margin:0 0 8px;color:#172033;font-size:16px;">${name}</h3><p style="margin:0;color:#667085;font-size:13px;">Starting from <strong style="color:#15803d;">₹${rate}</strong></p></article>`;
-      }).join("") || `<p style="color:#667085;">No matching services in this category.</p>`;
-    }
-    document.getElementById("home-service-search").addEventListener("input", renderHomeServices);
-    renderHomeServices();
-  </script>
+    <section class="trust-strip">
+      <div><strong>25K+</strong><span>Active users</span></div><i></i>
+      <div><strong>180+</strong><span>Services & jobs</span></div><i></i>
+      <div><strong>4.9/5</strong><span>Average rating</span></div><i></i>
+      <div><strong>24/7</strong><span>Emergency support</span></div>
+    </section>
+
+    <section class="section services-section" id="services">
+      <div class="section-head">
+        <div><p class="eyebrow dark"><span></span> Discover more</p><h2>Everything you need,<br><em>one tap away.</em></h2></div>
+        <p>Explore essential services, professional work and everyday support. Rates are transparent before you book.</p>
+      </div>
+      <label class="search-box"><span>⌕</span><input id="service-search" type="search" placeholder="Search plumber, tutor, driver, rental..."></label>
+      <div class="category-tabs" id="service-tabs"></div>
+      <div class="service-grid" id="service-grid"></div>
+    </section>
+
+    <section class="quick-section" id="quick">
+      <div class="quick-copy">
+        <p class="eyebrow"><span></span> Need help right now?</p>
+        <h2>Book urgent support.<br><em>We assign the pro.</em></h2>
+        <p>Choose your service, review the charge, and post. We search nearby verified professionals and assign one in moments.</p>
+        <div class="quick-points"><span>✓ Upfront starting rate</span><span>✓ Live worker search</span><span>✓ Arrival OTP protection</span></div>
+        <a class="button" href="login.html">Start quick booking <span>↗</span></a>
+      </div>
+      <div class="quick-visual">
+        <div class="quick-orbit"></div>
+        <div class="phone">
+          <div class="phone-top"><span></span><b>Quick Booking</b><small>•••</small></div>
+          <div class="phone-map"><div class="map-line"></div><i class="pin one">⌖</i><i class="pin two">⌖</i><i class="pin three">⌖</i><div class="radar"></div></div>
+          <div class="phone-body"><small>SEARCHING NEARBY</small><strong>Finding your professional</strong><div class="loading"><i></i><i></i><i></i></div><p>Verified worker · ETA 45 min</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section opportunity-section" id="opportunities">
+      <div class="section-head">
+        <div><p class="eyebrow dark"><span></span> Beyond daily services</p><h2>Work that moves<br><em>life forward.</em></h2></div>
+        <p>JobEase opens doors to flexible work, skill development, professional careers and opportunities around the world.</p>
+      </div>
+      <div class="pillar-grid">
+        <article class="pillar featured"><span>01</span><h3>Local services</h3><p>Daily work and skilled jobs for trusted professionals.</p><a href="register-worker.html">Join the network →</a></article>
+        <article class="pillar"><span>02</span><h3>Part-time jobs</h3><p>Flexible shifts, deliveries, support roles and more.</p></article>
+        <article class="pillar"><span>03</span><h3>International jobs</h3><p>Verified openings across Gulf countries and beyond.</p></article>
+        <article class="pillar"><span>04</span><h3>Training & skills</h3><p>Build credentials and unlock better opportunities.</p></article>
+      </div>
+    </section>
+
+    <section class="image-band">
+      <article><img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=700&q=80" alt="Home cleaning service"><div><small>HOME SUPPORT</small><h3>Help for everyday life.</h3></div></article>
+      <article><img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=700&q=80" alt="Electrician service"><div><small>SKILLED PROFESSIONALS</small><h3>Expertise you can trust.</h3></div></article>
+      <article><img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=700&q=80" alt="Professional opportunity"><div><small>OPPORTUNITIES</small><h3>Build what comes next.</h3></div></article>
+    </section>
+
+    <section class="safety" id="safety">
+      <div>
+        <p class="eyebrow"><span></span> Built for trust</p>
+        <h2>Safety is not a feature.<br><em>It is the foundation.</em></h2>
+      </div>
+      <div class="safety-list">
+        <article><b>01</b><div><h3>Verified identities</h3><p>KYC, documents, and background checks for sensitive categories.</p></div></article>
+        <article><b>02</b><div><h3>Protected bookings</h3><p>OTP-based arrivals and transparent booking records.</p></div></article>
+        <article><b>03</b><div><h3>Responsible access</h3><p>Legal review and extra verification for regulated services.</p></div></article>
+      </div>
+    </section>
+
+    <section class="cta">
+      <p class="eyebrow"><span></span> Your next step starts here</p>
+      <h2>Ready to unlock<br><em>more possibilities?</em></h2>
+      <div><a class="button" href="login.html">Book a service <span>↗</span></a><a class="button button-ghost" href="register-worker.html">Register as worker</a></div>
+    </section>
+  </main>
+
+  <footer><a class="brand" href="index.html"><span class="brand-mark">J</span><span>Job<span>Ease</span></span></a><p>One platform for work, services, skills & opportunities.</p><small>© 2026 JobEase. All rights reserved.</small></footer>
+  <script src="script.js"></script>
+  <script src="chatbot.js"></script>
 </body>
 </html>
