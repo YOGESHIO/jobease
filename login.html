@@ -7,8 +7,8 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <style>
     :root {
-      --primary: #f97316;
-      --primary-dark: #ea580c;
+      --primary: #c6f36b;
+      --primary-dark: #aee453;
       --ink: #172033;
       --muted: #667085;
       --line: #e5e7eb;
@@ -115,7 +115,7 @@
     .role.active {
       border-color: var(--primary);
       color: var(--primary-dark);
-      background: #fff7ed;
+      background: #f5ffe2;
     }
 
     form, label { display: grid; gap: 14px; }
@@ -207,13 +207,7 @@
 
       <div class="form-side">
         <h2>Log in</h2>
-        <p class="subtitle">Select your role and enter the static demo credentials.</p>
-
-        <div class="roles" aria-label="Select login role">
-          <button class="role active" type="button" data-role="customer">Customer</button>
-          <button class="role" type="button" data-role="worker">Worker</button>
-          <button class="role" type="button" data-role="admin">Admin</button>
-        </div>
+        <p class="subtitle">Enter your email and password to log in.</p>
 
         <form id="login-form">
           <label>
@@ -224,56 +218,47 @@
             Password
             <input id="password" type="password" autocomplete="current-password" required>
           </label>
-          <p class="error" id="login-error">Incorrect credentials for the selected role.</p>
-          <button class="submit" type="submit">Log in as <span id="role-label">Customer</span></button>
+          <p class="error" id="login-error">Incorrect email or password.</p>
+          <button class="submit" type="submit">Log in</button>
         </form>
 
         <div class="demo">
-          <strong>Static demo logins</strong><br>
+          <strong>Demo logins</strong><br>
           Customer: customer@jobease.com / customer123<br>
           Worker: worker@jobease.com / worker123<br>
           Admin: admin@jobease.com / admin123
         </div>
 
-        <p class="register">New worker? <a href="register-worker.html">Register as worker</a></p>
+        <p class="register">New user? <a href="register.html">Register here</a></p>
       </div>
     </section>
   </main>
 
   <script>
-    const accounts = {
-      customer: { email: "customer@jobease.com", password: "customer123" },
-      worker: { email: "worker@jobease.com", password: "worker123" },
-      admin: { email: "admin@jobease.com", password: "admin123" }
-    };
-
-    let selectedRole = "customer";
-    const roleLabel = document.getElementById("role-label");
     const error = document.getElementById("login-error");
+    const backendBase = location.protocol === "file:" ? "http://localhost:3000" : "";
 
-    document.querySelectorAll(".role").forEach((button) => {
-      button.addEventListener("click", () => {
-        selectedRole = button.dataset.role;
-        document.querySelectorAll(".role").forEach((item) => item.classList.remove("active"));
-        button.classList.add("active");
-        roleLabel.textContent = selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1);
-        error.style.display = "none";
-      });
-    });
-
-    document.getElementById("login-form").addEventListener("submit", (event) => {
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const account = accounts[selectedRole];
       const email = document.getElementById("email").value.trim().toLowerCase();
       const password = document.getElementById("password").value;
 
-      if (email !== account.email || password !== account.password) {
+      try {
+        const response = await fetch(`${backendBase}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        localStorage.setItem("jobeaseToken", result.token);
+        localStorage.setItem("jobeaseRole", result.user.role);
+        localStorage.setItem("jobeaseUser", JSON.stringify(result.user));
+        window.location.href = "dashboard.html";
+      } catch (loginError) {
         error.style.display = "block";
-        return;
+        error.textContent = loginError.message || "Unable to log in. Please try again.";
       }
-
-      localStorage.setItem("jobeaseRole", selectedRole);
-      window.location.href = "dashboard.html";
     });
   </script>
   <script src="chatbot.js"></script>

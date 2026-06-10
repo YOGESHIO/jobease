@@ -7,13 +7,13 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <style>
     :root {
-      --primary: #f97316;
-      --primary-dark: #ea580c;
+      --primary: #c6f36b;
+      --primary-dark: #aee453;
       --ink: #172033;
       --muted: #667085;
       --line: #e5e7eb;
       --surface: #ffffff;
-      --background: #fff8f1;
+      --background: #f5f7f2;
       --success: #15803d;
     }
 
@@ -249,6 +249,18 @@
       text-decoration: none;
     }
 
+    .form-error {
+      display: none;
+      margin: 0;
+      padding: 11px 13px;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #b42318;
+      background: #fef2f2;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     .success {
       display: none;
       padding: 28px;
@@ -443,6 +455,7 @@
               <span>I agree to the Terms of Service and Privacy Policy.</span>
             </label>
 
+            <p class="form-error" id="registration-error"></p>
             <button type="submit">Create worker account</button>
             <p class="login">Already have an account? <a href="login.html">Log in</a></p>
           </form>
@@ -461,8 +474,10 @@
     const form = document.getElementById("worker-registration-form");
     const content = document.getElementById("registration-content");
     const success = document.getElementById("registration-success");
+    const registrationError = document.getElementById("registration-error");
+    const backendBase = location.protocol === "file:" ? "http://localhost:3000" : "";
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       const data = new FormData(form);
@@ -473,8 +488,30 @@
       }
 
       form.elements.confirmPassword.setCustomValidity("");
-      content.style.display = "none";
-      success.style.display = "block";
+      registrationError.style.display = "none";
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Creating account...";
+      try {
+        const response = await fetch(`${backendBase}/api/workers/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(data.entries()))
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error);
+        content.style.display = "none";
+        success.style.display = "block";
+      } catch (registrationError) {
+        const message = registrationError.message === "Failed to fetch"
+          ? "Cannot reach the backend. Open this page from http://localhost:3000 and confirm that npm start is running."
+          : registrationError.message || "Unable to register. Please try again.";
+        document.getElementById("registration-error").textContent = message;
+        document.getElementById("registration-error").style.display = "block";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Create worker account";
+      }
     });
 
     form.elements.confirmPassword.addEventListener("input", () => {

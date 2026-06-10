@@ -7,7 +7,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <style>
     :root {
-      --primary: #f97316;
+     --primary: #9de8d5;
       --ink: #172033;
       --muted: #667085;
       --line: #e5e7eb;
@@ -25,7 +25,7 @@
     .card { min-height: 142px; padding: 22px; border: 1px solid var(--line); border-radius: 13px; background: #fff; box-shadow: 0 7px 18px rgba(23,32,51,.04); }
     .card h2 { margin: 0 0 9px; font-size: 18px; }
     .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
-    .tag { display: inline-block; margin-bottom: 13px; border-radius: 20px; padding: 6px 10px; color: #c2410c; background: #fff7ed; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .tag { display: inline-block; margin-bottom: 13px; border-radius: 20px; padding: 6px 10px; color: #176e68; background: #e7f6d0; font-size: 12px; font-weight: 800; text-transform: uppercase; }
     .panel { margin-top: 27px; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
     .panel-title { margin: 0; padding: 20px 21px 14px; font-size: 20px; }
     .table-wrap { overflow-x: auto; }
@@ -35,6 +35,21 @@
     td { color: #344054; }
     .action { margin-right: 7px; border: 0; border-radius: 7px; padding: 8px 10px; color: #fff; background: #172033; cursor: pointer; font-size: 12px; font-weight: 700; }
     .danger { background: #b42318; }
+    .act-menu { position: relative; display: inline-block; }
+    .act-menu-btn { border: 0; border-radius: 7px; padding: 7px 13px; color: #fff; background: #172033; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .act-menu-btn::after { content: "▾"; font-size: 10px; }
+    .act-dropdown { display: none; position: absolute; right: 0; top: 110%; min-width: 150px; background: #fff; border: 1px solid #e5e7eb; border-radius: 9px; box-shadow: 0 8px 24px rgba(0,0,0,0.13); z-index: 99; overflow: hidden; }
+    .act-menu:hover .act-dropdown,
+    .act-menu:focus-within .act-dropdown { display: block; }
+    .act-dropdown button { display: block; width: 100%; border: 0; padding: 10px 14px; text-align: left; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: #172033; }
+    .act-dropdown button:hover { background: #f0f4ff; }
+    .act-dropdown button.dd-danger { color: #b42318; }
+    .act-dropdown button.dd-danger:hover { background: #fff5f5; }
+    .act-dropdown button.dd-green { color: #15803d; }
+    .act-dropdown button.dd-green:hover { background: #f0fdf4; }
+    .act-dropdown button.dd-purple { color: #6366f1; }
+    .act-dropdown button.dd-purple:hover { background: #f5f3ff; }
+    .act-dropdown hr { margin: 3px 0; border: 0; border-top: 1px solid #f0f0f0; }
     .money { color: #15803d; font-size: 24px; font-weight: 800; }
     dialog { width: min(92vw, 590px); border: 0; border-radius: 14px; padding: 0; box-shadow: 0 20px 54px rgba(23,32,51,.2); }
     dialog::backdrop { background: rgba(23,32,51,.48); }
@@ -46,16 +61,16 @@
     .detail { padding: 12px; border-radius: 8px; background: #f8fafc; }
     .detail strong { display: block; margin-bottom: 5px; color: #475467; font-size: 11px; text-transform: uppercase; }
     .comments { margin: 18px 0 0; padding: 0; list-style: none; }
-    .comments li { margin-top: 9px; padding: 11px 12px; border-left: 3px solid var(--primary); color: #475467; background: #fff7ed; font-size: 13px; line-height: 1.5; }
+    .comments li { margin-top: 9px; padding: 11px 12px; border-left: 3px solid var(--primary); color: #475467; background: #effbf6; font-size: 13px; line-height: 1.5; }
     .customer-layout { display: grid; gap: 20px; margin-top: 27px; grid-template-columns: minmax(0, 620px); align-items: start; }
     .customer-layout .panel { margin-top: 0; }
     input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; outline: 0; padding: 11px 12px; color: var(--ink); background: #fff; font: inherit; }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(249,115,22,.12); }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(86,169,145,.14); }
     textarea { min-height: 86px; resize: vertical; }
     .job-form { display: grid; gap: 12px; padding: 0 20px 20px; }
     .job-form label { display: grid; gap: 6px; color: #475467; font-size: 12px; font-weight: 800; }
     .primary-action { border: 0; border-radius: 8px; padding: 11px 14px; color: #fff; background: var(--primary); cursor: pointer; font-weight: 800; }
-    .primary-action:hover { background: #ea580c; }
+    .primary-action:hover { background: #aee453; }
     .form-success { display: none; margin: 0; color: #15803d; font-size: 13px; font-weight: 700; }
     .posted-jobs { margin-top: 20px; }
     .quick-panel { margin-top: 20px; }
@@ -63,8 +78,8 @@
     .quick-grid { display: grid; gap: 12px; padding: 0 20px 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .quick-grid label { display: grid; gap: 6px; color: #475467; font-size: 12px; font-weight: 800; }
     .full { grid-column: 1 / -1; }
-    .price-box { display: none; padding: 14px; border: 1px solid #fed7aa; border-radius: 9px; color: #9a3412; background: #fff7ed; font-size: 14px; line-height: 1.6; }
-    .price-box strong { display: block; color: #7c2d12; font-size: 22px; }
+    .price-box { display: none; padding: 14px; border: 1px solid #d6ed9e; border-radius: 9px; color: #41650a; background: #f5ffe2; font-size: 14px; line-height: 1.6; }
+    .price-box strong { display: block; color: #214c45; font-size: 22px; }
     .booking-status { display: none; margin: 0 20px 20px; padding: 18px; border: 1px solid #bfdbfe; border-radius: 10px; background: #eff6ff; }
     .booking-status h3 { margin: 0 0 7px; font-size: 18px; }
     .booking-status p { margin: 5px 0; color: #475467; font-size: 14px; line-height: 1.5; }
@@ -72,9 +87,38 @@
     .otp { display: inline-block; margin-top: 9px; border-radius: 7px; padding: 7px 11px; color: #fff; background: #172033; font-size: 20px; font-weight: 800; letter-spacing: 4px; }
     .start-work { display: none; margin-top: 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .detail-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 860px) { .customer-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 520px) { .quick-grid { grid-template-columns: 1fr; } .full { grid-column: auto; } }
+    .star-row { display:flex; gap:3px; margin:5px 0; }
+    .star-btn { background:none; border:none; font-size:22px; cursor:pointer; color:#d1d5db; padding:0; line-height:1; transition:color .1s; }
+    .star-btn.on, .star-btn:hover, .star-btn:hover ~ .star-btn { color:#f59e0b; }
+    .star-row:hover .star-btn { color:#f59e0b; }
+    .star-row .star-btn:hover ~ .star-btn { color:#d1d5db; }
+    .rating-form { margin-top:8px; padding:10px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; }
+    .rating-form textarea { width:100%; border:1px solid #e5e7eb; border-radius:6px; padding:7px; font:inherit; font-size:12px; resize:vertical; min-height:52px; margin-top:6px; }
+    .rating-done { display:inline-block; margin-top:6px; padding:4px 10px; background:#fef3c7; border-radius:6px; color:#92400e; font-weight:700; font-size:13px; }
+    .search-dots { display:flex; gap:5px; align-items:center; }
+    .search-dots span { width:7px; height:7px; border-radius:50%; background:#2563eb; animation:dotbounce .8s infinite alternate; }
+    .search-dots span:nth-child(2){ animation-delay:.18s; }
+    .search-dots span:nth-child(3){ animation-delay:.36s; }
+    @keyframes dotbounce{ to{ transform:translateY(-7px); opacity:.35; } }
+    .status-cell { white-space:normal; min-width:160px; line-height:1.6; }
+    .worker-assigned-card { margin-top:6px; padding:8px 10px; border-radius:8px; background:#f0fdf4; border:1px solid #bbf7d0; }
+    .otp-badge { display:inline-block; padding:5px 13px; border-radius:7px; background:#172033; color:#fff; font-size:17px; font-weight:800; letter-spacing:4px; font-family:monospace; }
+    .ts { font-size:11px; color:var(--muted); margin-top:3px; }
+    .dash-tabs { display: flex; gap: 6px; margin-top: 27px; border-bottom: 2px solid var(--line); }
+    .dash-tab { border: 1px solid var(--line); border-bottom: 3px solid transparent; border-radius: 9px 9px 0 0; padding: 11px 22px; color: var(--muted); background: #f8fafc; cursor: pointer; font-size: 14px; font-weight: 700; margin-bottom: -2px; transition: color .15s, background .15s; }
+    .dash-tab.active { border-color: var(--primary); border-bottom-color: #fff; color: var(--ink); background: #fff; }
+    .dash-tab:hover:not(.active) { color: var(--ink); background: #fff; }
+    .tab-panel > .panel { margin-top: 0; border-radius: 0 13px 13px 13px; }
+    .otp-input { width: 110px; border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; font-size: 15px; letter-spacing: 3px; text-align: center; font-family: monospace; color: var(--ink); background: #fff; outline: 0; }
+    .otp-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(86,169,145,.14); }
+    .work-timer { font-size: 22px; font-weight: 800; color: #2563eb; font-variant-numeric: tabular-nums; letter-spacing: 1px; display: block; margin-bottom: 6px; }
+    .otp-badge { display: inline-block; padding: 5px 12px; border-radius: 7px; background: #172033; color: #fff; font-size: 18px; font-weight: 800; letter-spacing: 4px; font-family: monospace; }
+    .pay-options { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; margin-top: 16px; }
+    .pay-card { border: 2px solid var(--line); border-radius: 12px; padding: 20px 14px; text-align: center; cursor: pointer; background: #fff; font-weight: 700; font-size: 14px; transition: border-color .15s, background .15s; }
+    .pay-card:hover { border-color: var(--primary); background: #f5ffe2; }
+    .pay-card.selected { border-color: #15803d; background: #f0fdf4; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .detail-grid { grid-template-columns: 1fr; } .pay-options { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .quick-grid { grid-template-columns: 1fr; } .full { grid-column: auto; } .dash-tab { padding: 9px 13px; font-size: 13px; } }
   </style>
   <link rel="stylesheet" href="futuristic-ui.css">
 </head>
@@ -97,16 +141,32 @@
     </div>
     <div class="modal-body" id="worker-details"></div>
   </dialog>
+  <dialog id="payment-modal">
+    <div class="modal-head">
+      <h2>Confirm Payment</h2>
+      <button id="close-payment-modal" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="payment-modal-body"></div>
+  </dialog>
+  <dialog id="assign-modal">
+    <div class="modal-head">
+      <h2>Assign worker to job</h2>
+      <button id="close-assign-modal" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="assign-modal-body"></div>
+    <div class="modal-body" style="padding-top:0; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="action" id="assign-job-submit" type="button">Assign</button>
+    </div>
+  </dialog>
   <script>
+    if (window.location.protocol === "file:") {
+      window.location.replace("http://localhost:3000/dashboard.html");
+    }
     const views = {
       customer: {
         title: "Customer dashboard",
-        subtitle: "Post your service request and we will assign a suitable worker automatically.",
-        cards: [
-          ["Post a job", "Tell us what service you need and where the work is located."],
-          ["Automatic assignment", "A suitable worker is selected without exposing personal worker details."],
-          ["Track requests", "Review your posted jobs and current assignment status."]
-        ]
+        subtitle: "Book a service instantly or post a job — we connect you with the right professional.",
+        cards: []
       },
       worker: {
         title: "Worker dashboard",
@@ -128,49 +188,194 @@
       }
     };
 
+    const backendBase = location.protocol === "file:" ? "http://localhost:3000" : "";
     const role = localStorage.getItem("jobeaseRole");
-    const defaultWorkers = [
-      { id: 1, name: "Ravi Kumar", service: "Electrician", phone: "+91 98765 43210", city: "Delhi", experience: "5 years", rating: 4.8, jobs: 42, comments: ["Excellent work and arrived on time.", "Fixed the issue quickly."] },
-      { id: 2, name: "Anita Sharma", service: "Cleaner", phone: "+91 98111 22334", city: "Noida", experience: "3 years", rating: 4.6, jobs: 31, comments: ["Very professional service.", "Would book again."] },
-      { id: 3, name: "Mohit Verma", service: "Plumber", phone: "+91 98990 11223", city: "Gurugram", experience: "6 years", rating: 4.7, jobs: 56, comments: ["Helpful and knowledgeable.", "Resolved the leak properly."] }
-    ];
-    const workerJobs = [
-      { id: "JOB-1042", customer: "Neha Gupta", service: "Wiring repair", date: "30 May 2026", status: "Completed", amount: 1200, commission: 120 },
-      { id: "JOB-1043", customer: "Amit Singh", service: "Fan installation", date: "31 May 2026", status: "Accepted", amount: 850, commission: 85 },
-      { id: "JOB-1044", customer: "Karan Mehta", service: "Switchboard repair", date: "2 Jun 2026", status: "Pending", amount: 650, commission: 65 },
-      { id: "JOB-1039", customer: "Priya Jain", service: "Light installation", date: "27 May 2026", status: "Completed", amount: 900, commission: 90 }
-    ];
-
-    function getWorkers() {
-      const saved = localStorage.getItem("jobeaseWorkers");
-      if (saved) return JSON.parse(saved);
-      localStorage.setItem("jobeaseWorkers", JSON.stringify(defaultWorkers));
-      return defaultWorkers;
+    const token = localStorage.getItem("jobeaseToken");
+    if (!token) {
+      window.location.replace("login.html");
+    } else {
+      fetch(`${backendBase}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((response) => {
+          if (!response.ok) throw new Error("Session expired");
+          return response.json();
+        })
+        .then(({ user }) => {
+          if (user.role !== role) window.location.replace("login.html");
+        })
+        .catch(() => {
+          localStorage.removeItem("jobeaseToken");
+          localStorage.removeItem("jobeaseRole");
+          localStorage.removeItem("jobeaseUser");
+          window.location.replace("login.html");
+        });
     }
 
-    function renderAdmin() {
-      const workers = getWorkers();
+    let adminWorkers = [];
+    let adminJobs = [];
+    async function renderAdmin() {
+      const [workersRes, jobsRes, usersRes] = await Promise.all([
+          fetch(`${backendBase}/api/workers`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } }),
+          fetch(`${backendBase}/api/jobs`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } }),
+          fetch(`${backendBase}/api/users`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } })
+        ]);
+        const workersResult = await workersRes.json();
+        const jobsResult = await jobsRes.json();
+        const usersResult = await usersRes.json();
+        if (!workersRes.ok || !jobsRes.ok || !usersRes.ok) {
+        document.getElementById("role-content").innerHTML = `<section class="panel"><h2 class="panel-title">Unable to load admin information</h2></section>`;
+        return;
+      }
+      adminWorkers = workersResult.workers;
+        adminJobs = jobsResult.jobs || [];
+        const adminCustomers = usersResult.users || [];
+      const workers = adminWorkers;
+      const pendingJobs = adminJobs.filter((job) => !job.worker_id && job.status !== "Completed");
+      const assignedJobs = adminJobs.filter((job) => job.worker_id || job.status !== "Finding a worker");
       document.getElementById("role-content").innerHTML = `
         <section class="panel">
           <h2 class="panel-title">Registered workers</h2>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Name</th><th>Service</th><th>City</th><th>Rating</th><th>Jobs</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Name</th><th>Service</th><th>City</th><th>Rating</th><th>Status</th><th>Jobs</th><th>Actions</th></tr></thead>
               <tbody>
                 ${workers.map((worker) => `
+                  <tr style="${!worker.active ? 'opacity:0.55;' : ''}">
+                    <td>${worker.name}</td>
+                    <td>${worker.service}</td>
+                    <td>${worker.city}</td>
+                    <td>★ ${worker.rating}</td>
+                    <td>
+                      ${!worker.active
+                        ? `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#fee2e2;color:#b91c1c;">Inactive</span>`
+                        : !worker.verified
+                          ? `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#fef3c7;color:#92400e;">⏳ Unverified</span>`
+                          : worker.available
+                            ? `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#dcfce7;color:#15803d;">✓ Available</span>`
+                            : `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#dbeafe;color:#1d4ed8;">Busy</span>`}
+                    </td>
+                    <td>${worker.completedJobs}</td>
+                    <td>
+                      <div class="act-menu">
+                        <button class="act-menu-btn">Actions</button>
+                        <div class="act-dropdown">
+                          <button onclick="showWorker('${worker.id}')">View Details</button>
+                          <button ${worker.available && pendingJobs.length ? `onclick="showAssignModal('${worker.id}')"` : "disabled style='opacity:.45;cursor:not-allowed;'"}>Assign Job</button>
+                          <hr>
+                          ${!worker.verified ? `<button class="dd-green" onclick="verifyWorker('${worker.id}','${worker.name}')">✓ Verify Worker</button>` : `<span style="display:block;padding:10px 14px;font-size:12px;color:#15803d;">✓ Verified</span>`}
+                          <button class="${worker.active ? 'dd-danger' : 'dd-green'}" onclick="toggleWorkerStatus('${worker.id}',${!worker.active})">${worker.active ? "Deactivate" : "Activate"}</button>
+                          <button class="dd-purple" onclick="resetUserPassword('${worker.userId}','${worker.name}')">Reset Password</button>
+                          <hr>
+                          <button class="dd-danger" onclick="deleteWorker('${worker.id}')">Delete Account</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>`).join("") || `<tr><td colspan="7">No registered workers.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel">
+          <h2 class="panel-title">Registered customers</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Jobs</th><th>Active</th><th>Joined</th><th>Action</th></tr></thead>
+              <tbody>
+                ${adminCustomers.length ? adminCustomers.map((c) => `
                   <tr>
-                    <td>${worker.name}</td><td>${worker.service}</td><td>${worker.city}</td>
-                    <td>★ ${worker.rating}</td><td>${worker.jobs}</td>
-                    <td><button class="action" onclick="showWorker(${worker.id})">Details</button><button class="action danger" onclick="deleteWorker(${worker.id})">Delete</button></td>
-                  </tr>`).join("") || `<tr><td colspan="6">No registered workers.</td></tr>`}
+                    <td>${c.name}</td>
+                    <td>${c.email}</td>
+                    <td>${c.jobsCount}</td>
+                    <td>${c.active?"Yes":"No"}</td>
+                    <td>${new Date(c.createdAt).toLocaleString()}</td>
+                    <td><button class="action" style="background:#6366f1;" onclick="resetUserPassword('${c.id}','${c.name}')">Reset Pwd</button></td>
+                  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;">No customers found.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel">
+          <h2 class="panel-title">Pending job assignments</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Job ID</th><th>Title</th><th>Service</th><th>Location</th><th>Status</th><th>Budget</th></tr></thead>
+              <tbody>
+                ${pendingJobs.length ? pendingJobs.map((job) => `
+                  <tr>
+                    <td>${job.id}</td>
+                    <td>${job.title}</td>
+                    <td>${job.category}</td>
+                    <td>${job.location}</td>
+                    <td>${job.status}</td>
+                    <td>₹${job.amount}</td>
+                  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;">No pending job assignments.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel">
+          <h2 class="panel-title">Assigned jobs</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Job ID</th><th>Title</th><th>Service</th><th>Worker ID</th><th>Status</th><th>Budget</th></tr></thead>
+              <tbody>
+                ${assignedJobs.length ? assignedJobs.map((job) => `
+                  <tr>
+                    <td>${job.id}</td>
+                    <td>${job.title}</td>
+                    <td>${job.category}</td>
+                    <td>${job.worker_id || "-"}</td>
+                    <td>${job.status}</td>
+                    <td>₹${job.amount}</td>
+                  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;">No assigned jobs yet.</td></tr>`}
               </tbody>
             </table>
           </div>
         </section>`;
     }
 
+    async function showAssignModal(workerId) {
+      const worker = adminWorkers.find((item) => item.id === workerId);
+      if (!worker) return;
+      const pendingJobs = adminJobs.filter((job) => !job.worker_id && job.status !== "Completed");
+      document.getElementById("assign-modal-body").innerHTML = `
+        <div class="detail-grid">
+          <div class="detail"><strong>Worker</strong>${worker.name}</div>
+          <div class="detail"><strong>Service</strong>${worker.service}</div>
+          <div class="detail"><strong>City</strong>${worker.city}</div>
+          <div class="detail"><strong>Available</strong>${worker.available ? "Yes" : "No"}</div>
+        </div>
+        <label style="display:block; margin-top:18px; font-weight:700; color:#475467; font-size:12px; text-transform:uppercase;">Select job to assign</label>
+        <select id="assign-job-select" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:10px; margin-top:8px; font:inherit;">
+          ${pendingJobs.length ? pendingJobs.map((job) => `<option value="${job.id}">${job.id} – ${job.title} (${job.category})</option>`).join("") : `<option disabled>No jobs available for assignment</option>`}
+        </select>
+      `;
+      document.getElementById("assign-job-submit").onclick = async () => {
+        const selectedJobId = document.getElementById("assign-job-select").value;
+        if (!selectedJobId) return;
+        await assignJobToWorker(workerId, selectedJobId);
+      };
+      document.getElementById("assign-modal").showModal();
+    }
+
+    async function assignJobToWorker(workerId, jobId) {
+      try {
+        const response = await fetch(`${backendBase}/api/jobs/${jobId}/assign`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ workerId })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        alert(result.message || "Worker assigned successfully.");
+        document.getElementById("assign-modal").close();
+        renderAdmin();
+      } catch (error) {
+        alert(error.message || "Unable to assign worker.");
+      }
+    }
+
     function showWorker(id) {
-      const worker = getWorkers().find((item) => item.id === id);
+      const worker = (adminWorkers.length ? adminWorkers : getWorkers()).find((item) => item.id === id);
       if (!worker) return;
       document.getElementById("worker-details").innerHTML = `
         <div class="detail-grid">
@@ -179,55 +384,570 @@
           <div class="detail"><strong>Phone</strong>${worker.phone}</div>
           <div class="detail"><strong>City</strong>${worker.city}</div>
           <div class="detail"><strong>Experience</strong>${worker.experience}</div>
-          <div class="detail"><strong>Rating</strong>★ ${worker.rating} (${worker.jobs} jobs)</div>
+          <div class="detail"><strong>Rating</strong>★ ${worker.rating} (${worker.completedJobs ?? worker.jobs} jobs)</div>
         </div>
         <h3>Customer comments</h3>
-        <ul class="comments">${worker.comments.map((comment) => `<li>${comment}</li>`).join("")}</ul>`;
+        <ul class="comments">${(worker.reviews || worker.comments || []).map((review) => `<li>${review.comment || review}</li>`).join("") || "<li>No customer comments yet.</li>"}</ul>`;
       document.getElementById("worker-modal").showModal();
     }
 
-    function deleteWorker(id) {
+    async function resetUserPassword(userId, userName) {
+      const newPassword = prompt(`Set new password for "${userName}":\n(minimum 6 characters)`);
+      if (!newPassword) return;
+      if (newPassword.length < 6) { alert("Password must be at least 6 characters."); return; }
+      try {
+        const res = await fetch(`${backendBase}/api/users/${userId}/password`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ newPassword })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        alert(`Password for "${userName}" updated successfully.`);
+      } catch (e) {
+        alert(e.message || "Unable to update password.");
+      }
+    }
+
+    async function verifyWorker(workerId, workerName) {
+      if (!confirm(`Verify ${workerName}? They will be able to receive job assignments.`)) return;
+      try {
+        const res = await fetch(`${backendBase}/api/workers/${workerId}/verify`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` }
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderAdmin();
+      } catch (e) {
+        alert(e.message || "Unable to verify worker.");
+      }
+    }
+
+    async function toggleWorkerStatus(workerId, makeActive) {
+      const action = makeActive ? "activate" : "deactivate";
+      if (!confirm(`Are you sure you want to ${action} this worker?`)) return;
+      try {
+        const res = await fetch(`${backendBase}/api/workers/${workerId}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ active: makeActive })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderAdmin();
+      } catch (e) {
+        alert(e.message || `Unable to ${action} worker.`);
+      }
+    }
+
+    async function deleteWorker(id) {
       if (!confirm("Delete this worker account?")) return;
-      localStorage.setItem("jobeaseWorkers", JSON.stringify(getWorkers().filter((worker) => worker.id !== id)));
+      const response = await fetch(`${backendBase}/api/workers/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } });
+      if (!response.ok) {
+        const result = await response.json();
+        alert(result.error || "Unable to delete worker.");
+        return;
+      }
       renderAdmin();
     }
 
-    function renderWorker() {
-      const completed = workerJobs.filter((job) => job.status === "Completed");
-      const earnings = completed.reduce((total, job) => total + job.amount, 0);
-      const commission = completed.reduce((total, job) => total + job.commission, 0);
-      document.getElementById("cards").innerHTML = `
-        <article class="card"><h2>Total earnings</h2><p class="money">₹${earnings.toLocaleString("en-IN")}</p><p>Completed job value</p></article>
-        <article class="card"><h2>Commission</h2><p class="money">₹${commission.toLocaleString("en-IN")}</p><p>Platform commission deducted</p></article>
-        <article class="card"><h2>Net earnings</h2><p class="money">₹${(earnings - commission).toLocaleString("en-IN")}</p><p>Amount after commission</p></article>`;
-      document.getElementById("role-content").innerHTML = `
-        <section class="panel">
-          <h2 class="panel-title">Job details</h2>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Job ID</th><th>Customer</th><th>Service</th><th>Date</th><th>Status</th><th>Job value</th><th>Commission</th><th>Net earning</th></tr></thead>
-              <tbody>${workerJobs.map((job) => `<tr><td>${job.id}</td><td>${job.customer}</td><td>${job.service}</td><td>${job.date}</td><td>${job.status}</td><td>₹${job.amount}</td><td>₹${job.commission}</td><td>₹${job.amount - job.commission}</td></tr>`).join("")}</tbody>
-            </table>
+    async function renderWorker(activeTab = "jobs") {
+      try {
+        const [profileRes, jobsRes, quickRes] = await Promise.all([
+          fetch(`${backendBase}/api/worker/profile`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } }),
+          fetch(`${backendBase}/api/jobs`,            { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } }),
+          fetch(`${backendBase}/api/quick-bookings`,  { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } })
+        ]);
+        if (!profileRes.ok) throw new Error("Failed to load profile");
+        const { profile }       = await profileRes.json();
+        const { jobs = [] }     = jobsRes.ok ? await jobsRes.json() : {};
+        const { bookings = [] } = quickRes.ok ? await quickRes.json() : {};
+
+        const paidJobs    = jobs.filter(j => /^Payment/i.test(j.status));
+        const workerShare = paidJobs.reduce((s, j) => s + Math.max(0, Number(j.amount) - Number(j.commission || 0)), 0);
+        const activeJob   = jobs.find(j => ["Worker Accepted","Work Started","Work Completed"].includes(j.status));
+        const pendingCount= jobs.filter(j => j.status === "Worker Accepted").length;
+
+        document.getElementById("cards").innerHTML = `
+          <article class="card" style="cursor:pointer;" onclick="switchWorkerTab('profile')">
+            <h2>${profile.name}</h2>
+            <p>${profile.service} · ${profile.city}</p>
+            <p style="margin-top:8px;font-size:12px;font-weight:700;color:${profile.verified ? '#15803d' : '#b45309'}">
+              ${profile.verified ? '✓ Verified' : '⏳ Pending verification'}
+            </p>
+            <p class="ts" style="margin-top:6px;">Tap to view profile</p>
+          </article>
+          <article class="card"><h2>Rating</h2><p class="money">⭐ ${profile.rating}</p><p>${profile.completedJobs} jobs done</p></article>
+          <article class="card" style="cursor:pointer;" onclick="switchWorkerTab('income')">
+            <h2>Your income</h2><p class="money">₹${workerShare.toLocaleString("en-IN")}</p><p style="font-size:12px;">After 10% platform fee</p>
+          </article>`;
+
+        const jobRows = jobs.length ? jobs.map(job => {
+          let action = `<span style="color:var(--muted);font-size:12px;">—</span>`;
+          if (job.status === "Worker Notified" || job.status === "Assigned") {
+            action = `<span style="color:#b45309;font-size:12px;">Awaiting response…</span>`;
+          } else if (job.status === "Worker Accepted") {
+            action = `
+              <form style="display:flex;gap:5px;align-items:center;" onsubmit="verifyJobOtp(event,'${job.id}')">
+                <input class="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="OTP" required>
+                <button class="action" type="submit" style="white-space:nowrap;">Verify OTP</button>
+              </form>`;
+          } else if (job.status === "Work Started") {
+            action = `
+              <span class="work-timer" id="timer-${job.id}">00:00:00</span>
+              <button class="action" onclick="workerCompleteJob('${job.id}')">Mark Complete</button>`;
+          } else if (job.status === "Work Completed") {
+            action = `<button class="action" style="background:#15803d;border:0;" onclick="showWorkerPayment('${job.id}',${job.amount})">Confirm Payment</button>`;
+          } else if (/^Payment/i.test(job.status)) {
+            action = `<span style="color:#15803d;font-weight:700;">✓ Paid ₹${Number(job.amount).toLocaleString("en-IN")}</span>`;
+          }
+          let statusExtra = "";
+          if (job.status === "Work Started" && job.work_started_at) {
+            statusExtra = `<div class="ts">Started: ${fmtDate(job.work_started_at)}</div>`;
+          } else if (/^Payment/i.test(job.status) && job.completed_at) {
+            statusExtra = `<div class="ts">Paid: ${fmtDate(job.completed_at)}</div>`;
+          }
+          return `<tr>
+            <td>${job.title || job.category}<div class="ts">${fmtDate(job.created_at)}</div>${job.customerName ? `<div class="ts" style="color:#2563eb;">By: ${job.customerName}</div>` : ""}</td>
+            <td>${job.category}</td>
+            <td>${job.location}</td>
+            <td>₹${Number(job.amount).toLocaleString("en-IN")}</td>
+            <td>${job.status}${statusExtra}</td>
+            <td>${action}</td>
+          </tr>`;
+        }).join("") : `<tr><td colspan="6" style="text-align:center;color:var(--muted);">No jobs assigned yet.</td></tr>`;
+
+        const quickRows = bookings.length ? bookings.map(b => {
+          let qAction = `<span style="color:var(--muted);font-size:12px;">—</span>`;
+          if (b.status === "Worker assigned") {
+            qAction = `
+              <form style="display:flex;gap:5px;align-items:center;" onsubmit="verifyQuickOtp(event,'${b.id}')">
+                <input class="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="OTP" required>
+                <button class="action" type="submit" style="white-space:nowrap;">Verify OTP</button>
+              </form>`;
+          } else if (b.status === "Work started") {
+            qAction = `
+              <span class="work-timer" id="timer-q${b.id}">00:00:00</span>
+              <button class="action" onclick="completeQuickBooking('${b.id}')">Mark Complete</button>`;
+          } else if (b.status === "Work completed") {
+            qAction = `
+              <div style="display:flex;gap:6px;">
+                <button class="action" style="background:#15803d;" onclick="payQuickBooking('${b.id}','cash')">💵 Cash</button>
+                <button class="action" style="background:#2563eb;" onclick="payQuickBooking('${b.id}','upi')">📲 UPI</button>
+              </div>`;
+          } else if (/^Payment/i.test(b.status)) {
+            qAction = `<span style="color:#15803d;font-weight:700;">✓ Paid ₹${Number(b.starting_charge).toLocaleString("en-IN")}</span>`;
+          }
+          return `
+            <tr>
+              <td>${b.service}</td>
+              <td>${b.location}</td>
+              <td>${b.status}${b.status === "Work started" && b.started_at ? `<div class="ts">Started: ${fmtDate(b.started_at)}</div>` : ""}</td>
+              <td>₹${Number(b.starting_charge).toLocaleString("en-IN")}</td>
+              <td>${qAction}</td>
+            </tr>`;
+        }).join("") : `<tr><td colspan="5" style="text-align:center;color:var(--muted);">No quick bookings assigned yet.</td></tr>`;
+
+        const incomeRows = paidJobs.length ? paidJobs.map(j => `
+          <tr>
+            <td>${j.title || j.category}<div class="ts">${fmtDate(j.completed_at)}</div></td>
+            <td>${j.location}</td>
+            <td>₹${Number(j.amount).toLocaleString("en-IN")}</td>
+            <td style="color:#b45309;">-₹${Number(j.commission||0).toLocaleString("en-IN")}</td>
+            <td style="color:#15803d;font-weight:700;">₹${Math.max(0,Number(j.amount)-Number(j.commission||0)).toLocaleString("en-IN")}</td>
+          </tr>`).join("") : `<tr><td colspan="5" style="text-align:center;color:var(--muted);">No completed payments yet.</td></tr>`;
+
+        const tabs = [
+          { id:"jobs",    label:`My Jobs ${pendingCount ? `<span style="background:#ef4444;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;">${pendingCount}</span>` : ""}` },
+          { id:"quick",   label:"Quick Bookings" },
+          { id:"income",  label:"Income" },
+          { id:"profile", label:"Profile" }
+        ];
+
+        document.getElementById("role-content").innerHTML = `
+          <nav class="dash-tabs" id="worker-tabs" style="margin-top:18px;">
+            ${tabs.map(t => `<button class="dash-tab${activeTab===t.id?' active':''}" data-wtab="${t.id}">${t.label}</button>`).join("")}
+          </nav>
+
+          <div id="wtab-jobs" style="display:${activeTab==='jobs'?'block':'none'};">
+            <section class="panel" style="margin-top:0;border-top:none;border-radius:0 0 12px 12px;">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Title</th><th>Service</th><th>Location</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                  <tbody>${jobRows}</tbody>
+                </table>
+              </div>
+            </section>
           </div>
-        </section>`;
+
+          <div id="wtab-quick" style="display:${activeTab==='quick'?'block':'none'};">
+            <section class="panel" style="margin-top:0;border-top:none;border-radius:0 0 12px 12px;">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Service</th><th>Location</th><th>Status</th><th>Charge</th><th>Action</th></tr></thead>
+                  <tbody>${quickRows}</tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div id="wtab-income" style="display:${activeTab==='income'?'block':'none'};">
+            <section class="panel" style="margin-top:0;border-top:none;border-radius:0 0 12px 12px;">
+              <div style="padding:14px 20px;background:#f0fdf4;border-radius:8px;margin-bottom:14px;display:flex;gap:30px;align-items:center;">
+                <div><div class="ts">Total Earned</div><div style="font-size:22px;font-weight:800;color:#15803d;">₹${workerShare.toLocaleString("en-IN")}</div></div>
+                <div><div class="ts">Jobs Paid</div><div style="font-size:22px;font-weight:800;">${paidJobs.length}</div></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Job</th><th>Location</th><th>Amount</th><th>Commission (10%)</th><th>Your Share</th></tr></thead>
+                  <tbody>${incomeRows}</tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div id="wtab-profile" style="display:${activeTab==='profile'?'block':'none'};">
+            <section class="panel" style="margin-top:0;border-top:none;border-radius:0 0 12px 12px;">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:4px 0 16px;">
+                <div><div class="ts">Full Name</div><div style="font-weight:700;">${profile.name}</div></div>
+                <div><div class="ts">Email</div><div style="font-weight:700;">${profile.email}</div></div>
+                <div><div class="ts">Phone</div><div style="font-weight:700;">${profile.phone||'—'}</div></div>
+                <div><div class="ts">Service</div><div style="font-weight:700;">${profile.service}</div></div>
+                <div><div class="ts">City</div><div style="font-weight:700;">${profile.city}</div></div>
+                <div><div class="ts">Experience</div><div style="font-weight:700;">${profile.experience||'—'}</div></div>
+                <div><div class="ts">Rating</div><div style="font-weight:700;">⭐ ${profile.rating} (${profile.completedJobs} jobs)</div></div>
+                <div><div class="ts">Verification</div><div style="font-weight:700;color:${profile.verified?'#15803d':'#b45309'}">${profile.verified?'✓ Verified':'⏳ Pending'}</div></div>
+              </div>
+            </section>
+          </div>`;
+
+        // Tab switching
+        document.getElementById("worker-tabs").addEventListener("click", e => {
+          const btn = e.target.closest(".dash-tab[data-wtab]");
+          if (!btn) return;
+          switchWorkerTab(btn.dataset.wtab);
+        });
+
+        jobs.filter(j => j.status === "Work Started" && j.work_started_at).forEach(j => {
+          startJobTimer(j.id, new Date(j.work_started_at));
+        });
+        bookings.filter(b => b.status === "Work started" && b.started_at).forEach(b => {
+          startJobTimer("q" + b.id, new Date(b.started_at));
+        });
+      } catch (e) {
+        console.error(e);
+        document.getElementById("role-content").innerHTML = `<section class="panel"><h2 class="panel-title">Unable to load worker information</h2><p>${e.message}</p></section>`;
+      }
     }
 
-    function getCustomerJobs() {
-      return JSON.parse(localStorage.getItem("jobeaseCustomerJobs") || "[]");
+    function switchWorkerTab(tabId) {
+      ["jobs","quick","income","profile"].forEach(t => {
+        const el = document.getElementById(`wtab-${t}`);
+        if (el) el.style.display = t === tabId ? "block" : "none";
+        const btn = document.querySelector(`.dash-tab[data-wtab="${t}"]`);
+        if (btn) btn.classList.toggle("active", t === tabId);
+      });
     }
 
-    function renderCustomerJobs() {
-      const jobs = getCustomerJobs();
-      document.getElementById("customer-jobs").innerHTML = jobs.length
-        ? jobs.map((job) => `<tr><td>${job.title}</td><td>${job.category}</td><td>${job.location}</td><td>₹${job.budget}</td><td>${job.status}</td></tr>`).join("")
-        : `<tr><td colspan="5">No jobs posted yet.</td></tr>`;
+    async function verifyJobOtp(event, jobId) {
+      event.preventDefault();
+      const btn = event.target.querySelector("button");
+      const otp = event.target.querySelector("input").value.trim();
+      btn.disabled = true; btn.textContent = "Verifying…";
+      try {
+        const res = await fetch(`${backendBase}/api/jobs/${jobId}/verify-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ otp })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderWorker();
+      } catch (e) {
+        alert(e.message || "OTP verification failed.");
+        btn.disabled = false; btn.textContent = "Verify OTP";
+      }
+    }
+
+    async function verifyQuickOtp(event, bookingId) {
+      event.preventDefault();
+      const btn = event.target.querySelector("button");
+      const otp = event.target.querySelector("input").value.trim();
+      btn.disabled = true; btn.textContent = "Verifying…";
+      try {
+        const res = await fetch(`${backendBase}/api/quick-bookings/${bookingId}/verify-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ otp })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderWorker("quick");
+      } catch (e) {
+        alert(e.message || "OTP verification failed.");
+        btn.disabled = false; btn.textContent = "Verify OTP";
+      }
+    }
+
+    async function completeQuickBooking(bookingId) {
+      if (!confirm("Mark this quick booking as completed?")) return;
+      try {
+        const res = await fetch(`${backendBase}/api/quick-bookings/${bookingId}/complete`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` }
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderWorker("quick");
+      } catch (e) {
+        alert(e.message || "Unable to complete booking.");
+      }
+    }
+
+    async function payQuickBooking(bookingId, method) {
+      if (!confirm(`Record ${method.toUpperCase()} payment for this quick booking?`)) return;
+      try {
+        const res = await fetch(`${backendBase}/api/quick-bookings/${bookingId}/payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ method })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        alert(result.message);
+        renderWorker("quick");
+      } catch (e) {
+        alert(e.message || "Unable to record payment.");
+      }
+    }
+
+    function startJobTimer(jobId, startTime) {
+      const start = new Date(startTime).getTime();
+      function tick() {
+        const el = document.getElementById("timer-" + jobId);
+        if (!el) return;
+        const s = Math.floor((Date.now() - start) / 1000);
+        const h = String(Math.floor(s / 3600)).padStart(2, "0");
+        const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const sec = String(s % 60).padStart(2, "0");
+        el.textContent = `${h}:${m}:${sec}`;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    async function workerCompleteJob(jobId) {
+      if (!confirm("Mark this job as completed?")) return;
+      try {
+        const res = await fetch(`${backendBase}/api/jobs/${jobId}/complete`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` }
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderWorker();
+      } catch (e) {
+        alert(e.message || "Unable to complete job.");
+      }
+    }
+
+    function showWorkerPayment(jobId, amount) {
+      const upi = `upi://pay?pa=jobease@okicici&pn=JobEase&am=${amount}&tn=Job+${jobId}&cu=INR`;
+      const qr  = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upi)}`;
+      document.getElementById("payment-modal-body").innerHTML = `
+        <div class="detail-grid" style="margin-bottom:18px;">
+          <div class="detail"><strong>Job ID</strong>${jobId}</div>
+          <div class="detail"><strong>Amount Due</strong><span style="color:#15803d;font-weight:800;font-size:20px;">₹${Number(amount).toLocaleString("en-IN")}</span></div>
+        </div>
+        <p style="margin:0 0 4px;font-size:13px;color:var(--muted);font-weight:700;">SELECT PAYMENT METHOD</p>
+        <div class="pay-options">
+          <div class="pay-card" id="pay-upi" onclick="confirmWorkerPayment('${jobId}','upi',this)">
+            <div style="font-size:28px;margin-bottom:10px;">📱</div>
+            <div style="font-weight:800;margin-bottom:10px;">UPI / QR Code</div>
+            <img src="${qr}" width="160" height="160" style="border-radius:8px;display:block;margin:0 auto;" alt="UPI QR Code">
+            <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">Ask customer to scan & pay</p>
+          </div>
+          <div class="pay-card" id="pay-cash" onclick="confirmWorkerPayment('${jobId}','cash',this)">
+            <div style="font-size:28px;margin-bottom:10px;">💵</div>
+            <div style="font-weight:800;margin-bottom:10px;">Cash</div>
+            <div style="font-size:32px;font-weight:800;color:#15803d;margin:16px 0;">₹${Number(amount).toLocaleString("en-IN")}</div>
+            <p style="font-size:11px;color:var(--muted);margin:0;">Collect cash from customer</p>
+          </div>
+        </div>`;
+      document.getElementById("payment-modal").showModal();
+    }
+
+    async function confirmWorkerPayment(jobId, method, card) {
+      document.querySelectorAll(".pay-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      if (!confirm(`Confirm ${method.toUpperCase()} payment received?`)) { card.classList.remove("selected"); return; }
+      try {
+        const res = await fetch(`${backendBase}/api/jobs/${jobId}/payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ method })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        document.getElementById("payment-modal").close();
+        alert(`Payment of ₹${Number(result.job?.amount || 0).toLocaleString("en-IN")} via ${method.toUpperCase()} confirmed. Income updated.`);
+        renderWorker();
+      } catch (e) {
+        alert(e.message || "Unable to record payment.");
+        card.classList.remove("selected");
+      }
+    }
+
+    async function completeJob(jobId) {
+      return workerCompleteJob(jobId);
+    }
+
+    async function getCustomerJobs() {
+      try {
+        const response = await fetch(`${backendBase}/api/jobs`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } });
+        if (!response.ok) throw new Error("Failed to load jobs");
+        const result = await response.json();
+        return result.jobs || [];
+      } catch (e) {
+        console.error("Error fetching jobs:", e);
+        return [];
+      }
+    }
+
+    function fmtDate(ts) {
+      if (!ts) return "";
+      return new Date(ts).toLocaleString("en-IN", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:true });
+    }
+
+    async function renderCustomerJobs() {
+      const jobs = await getCustomerJobs();
+      const tbody = document.getElementById("customer-jobs");
+      if (!tbody) return;
+      tbody.innerHTML = jobs.length ? jobs.map(job => {
+        let statusCell;
+        if (job.status === "Pending Assignment" || job.status === "Worker Notified") {
+          statusCell = `<div class="search-dots"><span></span><span></span><span></span></div>
+            <div style="color:#2563eb;font-weight:700;margin-top:5px;">Searching for worker…</div>
+            <div class="ts">Posted: ${fmtDate(job.created_at)}</div>`;
+        } else if (job.status === "Worker Accepted") {
+          statusCell = `<div style="color:#15803d;font-weight:700;">Worker Assigned</div>
+            ${job.workerName ? `<div class="worker-assigned-card">
+              <div style="font-weight:800;font-size:13px;">${job.workerName}</div>
+              ${job.workerService ? `<div class="ts">${job.workerService}</div>` : ""}
+              ${job.workerPhone ? `<div class="ts">📞 ${job.workerPhone}</div>` : ""}
+            </div>` : ""}
+            <div style="margin-top:7px;"><small class="ts" style="font-weight:700;">Share OTP on arrival:</small></div>
+            <span class="otp-badge">${job.otp || "—"}</span>
+            <div class="ts">Posted: ${fmtDate(job.created_at)}</div>`;
+        } else if (job.status === "Work Started") {
+          statusCell = `<div style="color:#2563eb;font-weight:700;">Work in Progress</div>
+            <div class="ts">Started: ${fmtDate(job.work_started_at)}</div>
+            <div class="ts">Posted: ${fmtDate(job.created_at)}</div>`;
+        } else if (job.status === "Work Completed") {
+          statusCell = `<div style="color:#b45309;font-weight:700;">Work Completed</div>
+            <div class="ts">Completed: ${fmtDate(job.completed_at)}</div>
+            <div class="ts">Awaiting payment from worker</div>`;
+        } else if (/^Payment/i.test(job.status)) {
+          statusCell = `<div style="color:#15803d;font-weight:700;">✓ ${job.status}</div>
+            <div class="ts">Paid: ${fmtDate(job.completed_at)}</div>`;
+        } else {
+          statusCell = `<div>${job.status}</div><div class="ts">${fmtDate(job.created_at)}</div>`;
+        }
+        let actionCell;
+        if (/^Payment/i.test(job.status)) {
+          if (job.reviewed) {
+            actionCell = `<span class="rating-done">✓ Rated</span>`;
+          } else {
+            actionCell = `
+              <div class="rating-form">
+                <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:3px;">Rate this job</div>
+                <div class="star-row" id="stars-${job.id}">
+                  ${[1,2,3,4,5].map(n=>`<button class="star-btn" data-job="${job.id}" data-val="${n}" onclick="selectStar('${job.id}',${n})">★</button>`).join("")}
+                </div>
+                <textarea id="comment-${job.id}" placeholder="Leave a comment (optional)…"></textarea>
+                <button class="action" style="margin-top:6px;background:#f59e0b;" onclick="submitJobReview('${job.id}')">Submit Rating</button>
+              </div>`;
+          }
+        } else if (job.status === "Work Started" || job.status === "Work Completed") {
+          actionCell = `<span style="color:var(--muted);font-size:12px;">—</span>`;
+        } else {
+          actionCell = `<button class="action danger" onclick="deleteCustomerJob('${job.id}')">Delete</button>`;
+        }
+        return `<tr>
+          <td>${job.title}</td>
+          <td>${job.category}</td>
+          <td>${job.location}</td>
+          <td class="status-cell">${statusCell}</td>
+          <td>${actionCell}</td>
+        </tr>`;
+      }).join("") : `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">No requests posted yet.</td></tr>`;
+
+      // Auto-refresh while any job is in searching state
+      const hasSearching = jobs.some(j => j.status === "Worker Notified" || j.status === "Pending Assignment");
+      if (hasSearching && !window._custPoller) {
+        window._custPoller = setInterval(async () => {
+          const fresh = await getCustomerJobs();
+          const stillSearching = fresh.some(j => j.status === "Worker Notified" || j.status === "Pending Assignment");
+          if (document.querySelector(".dash-tab[data-tab='track']")?.classList.contains("active")) renderCustomerJobs();
+          if (!stillSearching) { clearInterval(window._custPoller); window._custPoller = null; }
+        }, 6000);
+      }
+    }
+
+    async function showPaymentModal(jobId, amount) {
+      const method = prompt("Select payment method:\n1. Cash\n2. UPI\n\nEnter 1 or 2:");
+      if (!method) return;
+      const paymentMethod = method === "1" ? "cash" : method === "2" ? "upi" : null;
+      if (!paymentMethod) {
+        alert("Invalid selection");
+        return;
+      }
+      try {
+        const response = await fetch(`${backendBase}/api/jobs/${jobId}/payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ method: paymentMethod })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        alert(`Payment recorded via ${paymentMethod.toUpperCase()}. Amount: ₹${amount}`);
+        location.reload();
+      } catch (e) {
+        alert("Error recording payment: " + e.message);
+      }
     }
 
     function renderCustomer() {
       document.getElementById("role-content").innerHTML = `
-        <div class="customer-layout">
+        <div class="dash-tabs">
+          <button class="dash-tab active" data-tab="quick">Quick Booking</button>
+          <button class="dash-tab" data-tab="post">Post a Job</button>
+          <button class="dash-tab" data-tab="track">Track Requests</button>
+        </div>
+        <div id="tab-quick" class="tab-panel">
           <section class="panel">
-            <h2 class="panel-title">Post a job</h2>
+            <h2 class="panel-title">Quick Booking</h2>
+            <p class="quick-intro">Need urgent help? Book a nearby worker within 1–2 hours. The starting charge is shown before you post.</p>
+            <form class="quick-grid" id="quick-booking-form">
+              <label>Urgent service
+                <select name="service" id="quick-service" required>
+                  <option value="">Select service</option>
+                  <option>Electrician</option><option>Plumber</option><option>Cleaner</option>
+                  <option>Carpenter</option><option>Painter</option><option>Appliance Repair</option>
+                </select>
+              </label>
+              <label>Your location<input name="location" required placeholder="Enter service location"></label>
+              <label class="full">Describe the issue<textarea name="details" required placeholder="Briefly explain what needs urgent attention"></textarea></label>
+              <div class="price-box full" id="quick-price"></div>
+              <button class="primary-action full" type="submit">Post quick booking</button>
+            </form>
+            <div class="booking-status" id="quick-status"></div>
+          </section>
+        </div>
+        <div id="tab-post" class="tab-panel" style="display:none">
+          <section class="panel">
+            <h2 class="panel-title">Post a Job</h2>
             <form class="job-form" id="customer-job-form">
               <label>Job title<input name="title" required placeholder="Example: Fix kitchen tap"></label>
               <label>Service category
@@ -236,66 +956,56 @@
                 </select>
               </label>
               <label>Location<input name="location" required placeholder="Enter job location"></label>
-              <label>Budget (₹)<input name="budget" required min="1" type="number" placeholder="Enter your budget"></label>
-              <div class="price-box" id="job-starting-rate"></div>
               <label>Job details<textarea name="details" required placeholder="Describe the work needed"></textarea></label>
-              <p class="form-success" id="job-success">Your job has been posted and a suitable worker has been assigned automatically.</p>
+              <p class="form-success" id="job-success">Job posted! We are finding a suitable worker for you.</p>
               <button class="primary-action" type="submit">Post job</button>
             </form>
           </section>
         </div>
-        <section class="panel posted-jobs">
-          <h2 class="panel-title">My posted jobs</h2>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Job</th><th>Service</th><th>Location</th><th>Budget</th><th>Status</th></tr></thead>
-              <tbody id="customer-jobs"></tbody>
-            </table>
-          </div>
-        </section>
-        <section class="panel quick-panel">
-          <h2 class="panel-title">Quick booking</h2>
-          <p class="quick-intro">Need urgent help? Book a nearby worker for service within 1-2 hours. Check the starting charge before posting your request.</p>
-          <form class="quick-grid" id="quick-booking-form">
-            <label>Urgent service
-              <select name="service" id="quick-service" required>
-                <option value="">Select service</option>
-                <option>Electrician</option><option>Plumber</option><option>Cleaner</option>
-                <option>Carpenter</option><option>Painter</option><option>Appliance Repair</option>
-              </select>
-            </label>
-            <label>Your location<input name="location" required placeholder="Enter service location"></label>
-            <label class="full">Describe the issue<textarea name="details" required placeholder="Briefly explain what needs urgent attention"></textarea></label>
-            <div class="price-box full" id="quick-price"></div>
-            <button class="primary-action full" type="submit">Post quick booking</button>
-          </form>
-          <div class="booking-status" id="quick-status"></div>
-        </section>`;
+        <div id="tab-track" class="tab-panel" style="display:none">
+          <section class="panel">
+            <h2 class="panel-title">My Requests</h2>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Title</th><th>Service</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="customer-jobs"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>`;
+
+      document.querySelectorAll(".dash-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".dash-tab").forEach(t => t.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach(p => { p.style.display = "none"; });
+          tab.classList.add("active");
+          document.getElementById("tab-" + tab.dataset.tab).style.display = "block";
+          if (tab.dataset.tab === "track") renderCustomerJobs();
+        });
+      });
 
       populateJobServices();
-      document.getElementById("job-service-category").addEventListener("change", showJobStartingRate);
-      document.getElementById("customer-job-form").addEventListener("submit", (event) => {
+      document.getElementById("customer-job-form").addEventListener("submit", async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const jobs = getCustomerJobs();
-        const matchingWorker = getWorkers().find((worker) => worker.service === data.get("category"));
-        jobs.unshift({
-          title: data.get("title"),
-          category: data.get("category"),
-          location: data.get("location"),
-          budget: data.get("budget"),
-          details: data.get("details"),
-          assignedWorkerId: matchingWorker ? matchingWorker.id : null,
-          status: matchingWorker ? "Worker assigned" : "Finding a worker"
-        });
-        localStorage.setItem("jobeaseCustomerJobs", JSON.stringify(jobs));
-        event.currentTarget.reset();
-        document.getElementById("job-success").style.display = "block";
-        renderCustomerJobs();
+        try {
+          const response = await fetch(`${backendBase}/api/jobs`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+            body: JSON.stringify(Object.fromEntries(data.entries()))
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error);
+          event.currentTarget.reset();
+          // Switch to Track Requests and show the searching loader
+          const trackTab = document.querySelector(".dash-tab[data-tab='track']");
+          if (trackTab) trackTab.click();
+        } catch (postingError) {
+          alert(postingError.message || "Unable to post your job.");
+        }
       });
       document.getElementById("quick-service").addEventListener("change", showQuickPrice);
       document.getElementById("quick-booking-form").addEventListener("submit", startQuickBooking);
-      renderCustomerJobs();
     }
 
     const quickCharges = {
@@ -326,49 +1036,22 @@
       box.style.display = "block";
     }
 
-    const jobServiceGroups = {
-      "Home Cleaning": ["Kambali Bai / Maid","House Cleaning","Deep Cleaning","Bathroom Cleaning","Kitchen Cleaning","Sofa Cleaning","Carpet Cleaning","Office Cleaning"],
-      "Repair Services": ["Plumber","Electrician","Carpenter","Painter","Welder","Mason","Tile Worker","POP Worker"],
-      "Appliance Repair": ["AC Repair","Refrigerator Repair","Washing Machine Repair","TV Repair","Microwave Repair","Water Purifier Repair","Geyser Repair"],
-      "Automobile Services": ["Bike Repair","Bike Washing","Puncture Repair","Bike Pickup Service","Car Repair","Car Washing","Car Detailing","Driver on Demand","Car Pickup Service","Towing Service","Battery Jump Start","Emergency Fuel Delivery"],
-      "Labour Jobs": ["Construction Labour","Factory Labour","Loading Unloading","Packers Movers Helper","Warehouse Worker","Daily Wage Labour"],
-      "Delivery Jobs": ["Food Delivery","Grocery Delivery","Parcel Delivery","Courier Delivery","Medicine Delivery"],
-      "Driver Services": ["Personal Driver","Monthly Driver","Truck Driver","Taxi Driver","School Van Driver","Delivery Driver"],
-      "Beauty & Wellness": ["Beautician","Makeup Artist","Hair Stylist","Nail Artist","Bridal Makeup","Massage Therapist","Yoga Trainer","Gym Trainer"],
-      "Education": ["Home Tutor","Online Tutor","Spoken English Teacher","Computer Teacher","Music Teacher","Dance Teacher"],
-      "IT & Freelancing": ["Data Entry","Content Writing","Graphic Designer","Video Editor","Website Developer","Mobile App Developer","Digital Marketing","SEO Expert"],
-      "Part-Time Jobs": ["Store Helper","Cashier","Receptionist","Promoter","Event Staff","Sales Executive","Telecaller","Delivery Boy","Packing Staff"],
-      "Work From Home": ["Customer Support","Chat Support","Content Writer","Virtual Assistant","Online Seller","Social Media Manager"],
-      "Event Services": ["Photographer","Videographer","DJ","Singer","Event Host","Decorator","Catering Staff","Wedding Planner"],
-      "Pet Services": ["Dog Walker","Pet Grooming","Pet Sitting","Pet Training"],
-      "Healthcare Support": ["Home Nurse","Caretaker","Elder Care","Patient Attendant","Physiotherapist Visit"],
-      "Business Support": ["Office Boy","Accountant","Data Operator","Security Guard","Office Cleaner"],
-      "Professional Jobs": ["Architect","Interior Designer","Civil Engineer","Electric Engineer","Mechanical Technician"],
-      "Social Companion Services": ["Movie Companion","Travel Companion","Event Companion","Shopping Companion","Senior Citizen Companion","Conversation Companion"],
-      "Future & Smart Services": ["AI Assistant Setup","AI Content Creation","AI Training","CCTV Installation","Smart Device Setup","Home Automation"],
-      "Security & Investigation": ["Private Investigator / Detective","Background Verification","Employee Verification","Tenant Verification","Matrimonial Verification","Missing Person Investigation","Fraud Investigation Support","Corporate Investigation"],
-      "Security Services": ["Security Guard","Bouncer","Event Security","CCTV Monitoring","Security Supervisor","Personal Security Escort"],
-      "Emergency Services": ["Ambulance Booking","Roadside Assistance","Emergency Electrician","Emergency Plumber","Locksmith","Water Tanker Booking"],
-      "Senior Citizen Services": ["Elder Companion","Hospital Visit Assistance","Medicine Pickup","Home Care Assistant","Daily Check-In Service"],
-      "Women Support Services": ["Female Driver","Female Security Escort","Babysitter","Caretaker","Women-only Home Services"],
-      "Property Services": ["Property Inspection","Property Manager","Rent Collection Agent","Tenant Search","Property Photography"],
-      "Agriculture Services": ["Farm Labour","Tractor Rental","Harvester Rental","Irrigation Technician","Dairy Worker","Animal Care Worker"],
-      "Religious & Cultural Services": ["Pandit Booking","Pujan Services","Wedding Ritual Services","Bhajan/Kirtan Group","Event Decoration"],
-      "Documentation Services": ["Passport Assistance","PAN Card Assistance","Aadhaar Update Assistance","Government Form Filling","GST Registration Support","Income Tax Filing"],
-      "Creative Services": ["Photographer","Videographer","Drone Operator","Graphic Designer","Content Creator","Social Media Manager"],
-      "Rental Services": ["House Rent","Room Rent","Vehicle Rent","Equipment Rent","Generator Rent","Camera Rent"],
-      "Education & Career": ["Resume Writing","Interview Preparation","Career Counseling","Language Trainer","Computer Training"],
-      "Healthcare & Wellness": ["Home Nurse","Physiotherapist","Yoga Trainer","Dietitian","Medical Attendant"],
-      "Household Support": ["Maid","Cook","Babysitter","Laundry Service","Ironing Service"],
-      "Marketplace": ["Tools","Equipment","Materials"]
-    };
-
-    function populateJobServices() {
+    async function populateJobServices() {
       const select = document.getElementById("job-service-category");
-      Object.entries(jobServiceGroups).forEach(([group, services]) => {
-        const options = services.map((service) => `<option>${service}</option>`).join("");
-        select.insertAdjacentHTML("beforeend", `<optgroup label="${group}">${options}</optgroup>`);
-      });
+      try {
+        const res = await fetch(`${backendBase}/api/services`);
+        if (!res.ok) throw new Error('Failed to fetch services');
+        const data = await res.json();
+        const catalog = data.catalog || {};
+        Object.entries(catalog).forEach(([group, services]) => {
+          const options = services.map((s) => `<option>${s[0]}</option>`).join("");
+          select.insertAdjacentHTML("beforeend", `<optgroup label="${group}">${options}</optgroup>`);
+        });
+      } catch (e) {
+        // Fallback minimal options if API is unavailable
+        select.insertAdjacentHTML('beforeend', '<option>Electrician</option><option>Plumber</option>');
+        console.error('populateJobServices error', e);
+      }
     }
 
     function showQuickPrice() {
@@ -391,30 +1074,54 @@
       status.innerHTML = `<div class="loader"></div><h3>Searching for a nearby worker...</h3><p>We are finding an available ${service.toLowerCase()} professional for your location.</p>`;
       event.currentTarget.querySelector("button").disabled = true;
 
-      setTimeout(() => assignQuickWorker(service, data.get("location")), 1800);
+      setTimeout(() => assignQuickWorker(service, data.get("location"), data.get("details")), 1800);
     }
 
-    function assignQuickWorker(service, location) {
-      const worker = getWorkers().find((item) => item.service === service) || getWorkers()[0];
+    async function assignQuickWorker(service, location, details) {
       const status = document.getElementById("quick-status");
-      const otp = String(Math.floor(1000 + Math.random() * 9000));
-      localStorage.setItem("jobeaseQuickBooking", JSON.stringify({ service, location, workerId: worker.id, otp, status: "Worker assigned" }));
-      status.innerHTML = `
-        <h3>Worker assigned successfully</h3>
-        <p><strong>${worker.name}</strong> has accepted your quick booking.</p>
-        <p>Service: ${service}<br>Location: ${location}<br>Estimated arrival: <strong>45 minutes</strong></p>
-        <p>Share this OTP only after the worker arrives:</p>
-        <span class="otp">${otp}</span>
-        <p>The worker must enter this OTP before work can start.</p>
-        <button class="primary-action start-work" id="start-work-demo" type="button">Confirm worker arrival and start work</button>`;
-      const button = document.getElementById("start-work-demo");
-      button.style.display = "inline-block";
-      button.addEventListener("click", () => {
-        const booking = JSON.parse(localStorage.getItem("jobeaseQuickBooking"));
-        booking.status = "Work started";
-        localStorage.setItem("jobeaseQuickBooking", JSON.stringify(booking));
-        status.innerHTML = `<h3>Work started</h3><p>OTP verified successfully. Your ${service.toLowerCase()} service is now in progress.</p>`;
+      const response = await fetch(`${backendBase}/api/quick-bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+        body: JSON.stringify({ service, location, details, startingCharge: quickCharges[service] })
       });
+      const result = await response.json();
+      if (!response.ok) {
+        status.innerHTML = `<h3>Unable to create booking</h3><p>${result.error}</p>`;
+        return;
+      }
+      const booking = result.booking;
+      localStorage.setItem("jobeaseQuickBooking", JSON.stringify(booking));
+      if (booking.status === "No Worker Available") {
+        status.innerHTML = `<h3 style="color:#b45309;">No worker found nearby</h3><p>No ${service} professional is available in <strong>${location}</strong> right now. Please try again later.</p>`;
+        return;
+      }
+      // Worker Notified — waiting for worker to accept
+      status.innerHTML = `
+        <div class="search-dots" style="margin-bottom:10px;"><span></span><span></span><span></span></div>
+        <h3 style="color:#2563eb;">Notifying a worker…</h3>
+        <p>A nearby <strong>${service}</strong> professional has been notified for <strong>${location}</strong>.</p>
+        <p style="font-size:13px;color:var(--muted);">The worker must accept your request. This page will update automatically.</p>`;
+      // Poll every 5 seconds until worker accepts
+      const bookingId = booking.id;
+      const qbPoller = setInterval(async () => {
+        const res = await fetch(`${backendBase}/api/quick-bookings`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } });
+        const data = res.ok ? await res.json() : {};
+        const updated = (data.bookings || []).find(b => b.id === bookingId);
+        if (!updated) return;
+        if (updated.status === "Worker assigned") {
+          clearInterval(qbPoller);
+          status.innerHTML = `
+            <h3 style="color:#15803d;">✓ Worker Assigned</h3>
+            <p><strong>${updated.workerName || "Your worker"}</strong> has accepted your booking and is on the way.</p>
+            <p>Service: ${service}<br>Location: ${location}<br>Estimated arrival: <strong>45 minutes</strong></p>
+            <p>Share this OTP only after the worker arrives:</p>
+            <span class="otp">${updated.otp}</span>
+            <p style="font-size:13px;">The worker must enter this OTP before work can start.</p>`;
+        } else if (updated.status === "No Worker Available") {
+          clearInterval(qbPoller);
+          status.innerHTML = `<h3 style="color:#b45309;">No worker accepted</h3><p>No nearby ${service} professional accepted the request. Please try again.</p>`;
+        }
+      }, 5000);
     }
     if (!views[role]) {
       window.location.replace("login.html");
@@ -432,10 +1139,264 @@
     }
 
     document.getElementById("close-modal").addEventListener("click", () => document.getElementById("worker-modal").close());
-    document.getElementById("logout").addEventListener("click", () => {
+    document.getElementById("close-assign-modal").addEventListener("click", () => document.getElementById("assign-modal").close());
+    document.getElementById("close-payment-modal").addEventListener("click", () => document.getElementById("payment-modal").close());
+    document.getElementById("logout").addEventListener("click", async () => {
+      const token = localStorage.getItem("jobeaseToken");
+      if (token) {
+        await fetch(`${backendBase}/api/auth/logout`, { method: "POST", headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
+      }
+      localStorage.removeItem("jobeaseToken");
       localStorage.removeItem("jobeaseRole");
+      localStorage.removeItem("jobeaseUser");
       window.location.href = "login.html";
     });
+  </script>
+  <script>
+    let jobeasePendingAssignmentWorker = null;
+
+    function selectStar(jobId, val) {
+      const btns = document.querySelectorAll(`#stars-${jobId} .star-btn`);
+      btns.forEach(b => b.classList.toggle("on", Number(b.dataset.val) <= val));
+      document.getElementById(`stars-${jobId}`).dataset.selected = val;
+    }
+
+    async function submitJobReview(jobId) {
+      const starsEl = document.getElementById(`stars-${jobId}`);
+      const rating = Number(starsEl?.dataset.selected || 0);
+      if (!rating) { alert("Please select a star rating before submitting."); return; }
+      const comment = document.getElementById(`comment-${jobId}`)?.value || "";
+      try {
+        const res = await fetch(`${backendBase}/api/jobs/${jobId}/review`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
+          body: JSON.stringify({ rating, comment })
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        alert(result.message);
+        renderCustomerJobs();
+      } catch (e) {
+        alert(e.message || "Unable to submit rating.");
+      }
+    }
+
+    async function deleteCustomerJob(jobId) {
+      if (!jobId || !confirm("Delete this posted job?")) return;
+      const response = await fetch(`/api/jobs/${jobId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        alert(result.error || "Unable to delete job.");
+        return;
+      }
+      localStorage.setItem("jobeaseCustomerJobs", JSON.stringify(
+        JSON.parse(localStorage.getItem("jobeaseCustomerJobs") || "[]").filter((job) => job.id !== jobId)
+      ));
+      window.location.reload();
+    }
+
+    function enhanceCustomerJobDeleteButtons() {
+      const headings = Array.from(document.querySelectorAll("h2, .panel-title"));
+      const jobsPanel = headings.find((heading) => /posted jobs|job assignments/i.test(heading.textContent))?.closest("section, .panel, div");
+      if (!jobsPanel || jobsPanel.dataset.deleteEnhanced === "true") return;
+      const table = jobsPanel.querySelector("table");
+      if (!table) return;
+      const headerRow = table.querySelector("thead tr");
+      if (headerRow && !/action/i.test(headerRow.textContent)) headerRow.insertAdjacentHTML("beforeend", "<th>Action</th>");
+      const savedJobs = JSON.parse(localStorage.getItem("jobeaseCustomerJobs") || "[]");
+      table.querySelectorAll("tbody tr").forEach((row, index) => {
+        if (row.querySelector("[data-delete-job]")) return;
+        const firstCell = row.querySelector("td");
+        const jobId = firstCell?.textContent.trim().match(/JOB-[A-Za-z0-9]+/)?.[0] || savedJobs[index]?.id;
+        if (!jobId) return;
+        const cells = row.querySelectorAll("td");
+        const actionCell = cells[cells.length - 1];
+        if (actionCell && actionCell.textContent.trim() === "-") {
+          actionCell.innerHTML = `<button class="action danger" data-delete-job="${jobId}" type="button">Delete</button>`;
+        } else {
+          row.insertAdjacentHTML("beforeend", `<td><button class="action danger" data-delete-job="${jobId}" type="button">Delete</button></td>`);
+        }
+      });
+      jobsPanel.dataset.deleteEnhanced = "true";
+    }
+
+    document.addEventListener("click", (event) => {
+      const deleteButton = event.target.closest("[data-delete-job]");
+      if (!deleteButton) return;
+      event.preventDefault();
+      deleteCustomerJob(deleteButton.dataset.deleteJob);
+    });
+
+    setInterval(enhanceCustomerJobDeleteButtons, 700);
+
+    async function renderWorkerNotificationsPanel() {
+      if (localStorage.getItem("jobeaseRole") !== "worker") return;
+      const token = localStorage.getItem("jobeaseToken");
+      if (!token || document.getElementById("worker-notifications-panel")) return;
+      const [jobRes, qbRes] = await Promise.all([
+        fetch(`${backendBase}/api/worker/notifications`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${backendBase}/api/worker/quick-booking-notifications`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      const jobResult = jobRes.ok ? await jobRes.json().catch(() => ({})) : {};
+      const qbResult  = qbRes.ok  ? await qbRes.json().catch(() => ({}))  : {};
+      const jobNotifs = jobResult.notifications || [];
+      const qbNotifs  = qbResult.notifications  || [];
+      if (!jobNotifs.length && !qbNotifs.length) return;
+      const target = document.getElementById("role-content") || document.querySelector("main");
+
+      const jobRows = jobNotifs.length ? jobNotifs.map(n => `
+        <tr>
+          <td><span style="font-size:11px;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:5px;font-weight:700;">JOB</span> ${n.title||n.category}</td>
+          <td>${n.category}</td>
+          <td>${n.location}</td>
+          <td>₹${Number(n.amount).toLocaleString("en-IN")}</td>
+          <td>
+            <button class="action" style="background:#15803d;" data-notification-accept="${n.id}" type="button">Accept</button>
+            <button class="action danger" data-notification-reject="${n.id}" type="button">Reject</button>
+          </td>
+        </tr>`).join("") : "";
+
+      const qbRows = qbNotifs.length ? qbNotifs.map(n => `
+        <tr>
+          <td><span style="font-size:11px;background:#fef9c3;color:#92400e;padding:2px 7px;border-radius:5px;font-weight:700;">QUICK</span> ${n.service}</td>
+          <td>${n.service}</td>
+          <td>${n.location}</td>
+          <td>₹${Number(n.amount).toLocaleString("en-IN")}</td>
+          <td>
+            <button class="action" style="background:#15803d;" data-qb-accept="${n.id}" type="button">Accept</button>
+            <button class="action danger" data-qb-reject="${n.id}" type="button">Reject</button>
+          </td>
+        </tr>`).join("") : "";
+
+      target.insertAdjacentHTML("afterbegin", `
+        <section class="panel" id="worker-notifications-panel" style="border-left:4px solid #f59e0b;">
+          <h2 class="panel-title" style="color:#92400e;">⚡ Incoming Requests</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Service</th><th>Type</th><th>Location</th><th>Charge</th><th>Action</th></tr></thead>
+              <tbody>${jobRows}${qbRows || `<tr><td colspan="5" style="text-align:center;color:var(--muted);">No pending notifications.</td></tr>`}</tbody>
+            </table>
+          </div>
+        </section>`);
+    }
+
+    document.addEventListener("click", async (event) => {
+      const jobAccept = event.target.closest("[data-notification-accept]");
+      const jobReject = event.target.closest("[data-notification-reject]");
+      const qbAccept  = event.target.closest("[data-qb-accept]");
+      const qbReject  = event.target.closest("[data-qb-reject]");
+      if (!jobAccept && !jobReject && !qbAccept && !qbReject) return;
+      event.preventDefault();
+      const token = localStorage.getItem("jobeaseToken");
+      let url, action;
+      if (jobAccept || jobReject) {
+        const nid = (jobAccept||jobReject).dataset[jobAccept ? "notificationAccept" : "notificationReject"];
+        action = jobAccept ? "accept" : "reject";
+        url = `${backendBase}/api/worker/notifications/${nid}/${action}`;
+      } else {
+        const nid = (qbAccept||qbReject).dataset[qbAccept ? "qbAccept" : "qbReject"];
+        action = qbAccept ? "accept" : "reject";
+        url = `${backendBase}/api/worker/quick-booking-notifications/${nid}/${action}`;
+      }
+      const response = await fetch(url, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) { alert(result.error || `Unable to ${action}.`); return; }
+      alert(result.message);
+      if (qbAccept) { renderWorker("quick"); } else { renderWorker("jobs"); }
+    });
+
+    setTimeout(renderWorkerNotificationsPanel, 900);
+
+    async function findWorkerForAssignment(row) {
+      const cells = Array.from(row.querySelectorAll("td")).map((cell) => cell.textContent.trim());
+      const [name, service, city] = cells;
+      const token = localStorage.getItem("jobeaseToken");
+      if (!token || !name) return null;
+
+      const response = await fetch("/api/workers", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Unable to load workers.");
+
+      return result.workers.find((worker) =>
+        worker.name === name &&
+        worker.service === service &&
+        (!city || worker.city === city)
+      ) || null;
+    }
+
+    document.addEventListener("click", async (event) => {
+      const button = event.target.closest("button");
+      if (!button || button.textContent.trim().toLowerCase() !== "assign") return;
+
+      const row = button.closest("tr");
+      if (row) {
+        findWorkerForAssignment(row)
+          .then((worker) => { jobeasePendingAssignmentWorker = worker; })
+          .catch(() => { jobeasePendingAssignmentWorker = null; });
+        return;
+      }
+
+      let assignmentPanel = button.closest("dialog, .modal, .assignment-modal");
+      if (!assignmentPanel) {
+        let parent = button.parentElement;
+        while (parent && parent !== document.body) {
+          if (parent.querySelector("select") && /assign worker to job/i.test(parent.textContent)) {
+            assignmentPanel = parent;
+            break;
+          }
+          parent = parent.parentElement;
+        }
+      }
+      const select = assignmentPanel?.querySelector("select");
+      const selectedJobText = select?.value || select?.selectedOptions?.[0]?.textContent || "";
+      const selectedJobId = selectedJobText.match(/JOB-[A-Za-z0-9]+/)?.[0] || selectedJobText.trim();
+
+      if (!select || !selectedJobId) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      try {
+        const token = localStorage.getItem("jobeaseToken");
+        if (!token) throw new Error("Please login as admin again.");
+        if (!jobeasePendingAssignmentWorker?.id) {
+          const details = Array.from(assignmentPanel.querySelectorAll(".detail, [class*='detail'], div"))
+            .map((item) => item.textContent.trim())
+            .join(" ");
+          const workerResponse = await fetch("/api/workers", { headers: { Authorization: `Bearer ${token}` } });
+          const workerResult = await workerResponse.json();
+          jobeasePendingAssignmentWorker = workerResult.workers?.find((worker) =>
+            details.includes(worker.name) && details.includes(worker.service)
+          );
+        }
+        if (!jobeasePendingAssignmentWorker?.id) throw new Error("Please close this popup and click Assign again for the worker.");
+
+        button.disabled = true;
+        button.textContent = "Assigning...";
+        const response = await fetch("/api/jobs/assign", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ jobId: selectedJobId, workerId: jobeasePendingAssignmentWorker.id })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "Unable to assign job.");
+
+        alert("Worker assigned successfully.");
+        window.location.reload();
+      } catch (assignmentError) {
+        alert(assignmentError.message || "Unable to assign job.");
+        button.disabled = false;
+        button.textContent = "Assign";
+      }
+    }, true);
   </script>
   <script src="chatbot.js"></script>
 </body>

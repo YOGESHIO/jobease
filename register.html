@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | JobEase</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="futuristic-ui.css">
+  <style>
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #fff !important;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(198, 243, 107, 0.22), transparent 32%),
+        radial-gradient(circle at 82% 20%, rgba(255, 107, 53, 0.18), transparent 28%),
+        linear-gradient(135deg, #06171b 0%, #092a30 48%, #0b3d43 100%) !important;
+    }
+
+    .register-shell {
+      position: relative;
+      min-height: 100vh;
+      padding: 30px clamp(20px, 5vw, 74px) 54px;
+    }
+
+    .register-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 62px;
+    }
+
+    .register-nav .brand {
+      color: #fff;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .register-grid {
+      display: grid;
+      gap: 34px;
+      grid-template-columns: minmax(0, 0.92fr) minmax(520px, 1.08fr);
+      align-items: center;
+    }
+
+    .hero-copy {
+      padding: 0;
+    }
+
+    .hero-copy h1 {
+      margin: 0;
+      font: 800 clamp(54px, 7vw, 92px)/0.95 "Manrope", Arial, sans-serif;
+      letter-spacing: -5px;
+    }
+
+    .hero-copy h1 em {
+      color: #c6f36b;
+      font-family: Georgia, serif;
+      font-weight: 400;
+    }
+
+    .hero-copy p {
+      max-width: 590px;
+      margin: 24px 0 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 17px;
+      line-height: 1.75;
+    }
+
+    .register-proof {
+      display: grid;
+      gap: 12px;
+      max-width: 520px;
+      margin-top: 34px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .proof-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 18px;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .proof-card strong {
+      display: block;
+      color: #c6f36b;
+      font: 800 26px "Manrope", Arial, sans-serif;
+    }
+
+    .proof-card span {
+      display: block;
+      margin-top: 6px;
+      color: rgba(255,255,255,.65);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .choice-panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 30px;
+      padding: clamp(22px, 4vw, 38px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+      backdrop-filter: blur(24px);
+    }
+
+    .choice-panel::before {
+      position: absolute;
+      inset: -1px;
+      z-index: -1;
+      background: linear-gradient(145deg, rgba(198,243,107,.18), transparent 40%, rgba(255,107,53,.15));
+      content: "";
+    }
+
+    .panel-top {
+      margin-bottom: 24px;
+    }
+
+    .panel-top h2 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: clamp(30px, 4vw, 42px);
+    }
+
+    .panel-top p {
+      margin: 0;
+      color: rgba(255,255,255,.62);
+      line-height: 1.6;
+    }
+
+    .account-cards {
+      display: grid;
+      gap: 16px;
+    }
+
+    .account-card {
+      display: grid;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 23px;
+      color: #fff;
+      background: rgba(6, 23, 27, 0.62);
+      transition: transform .25s ease, border-color .25s ease, background .25s ease;
+    }
+
+    .account-card:hover {
+      border-color: rgba(198,243,107,.55);
+      background: rgba(7, 34, 39, 0.82);
+      transform: translateY(-4px);
+    }
+
+    .account-icon {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      place-items: center;
+      border-radius: 17px;
+      color: #092a30;
+      background: #c6f36b;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .account-card.worker .account-icon {
+      color: #092a30;
+      background: #9de8d5;
+    }
+
+    .account-card h3 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.8px;
+    }
+
+    .account-card p {
+      margin: -8px 0 0;
+      color: rgba(255,255,255,.63);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .account-card ul {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .account-card li {
+      color: rgba(255,255,255,.74);
+      font-size: 13px;
+    }
+
+    .account-card li::before {
+      margin-right: 8px;
+      color: #c6f36b;
+      content: "✓";
+      font-weight: 800;
+    }
+
+    .account-action {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 9px;
+      border-radius: 30px;
+      padding: 12px 16px;
+      color: #092a30;
+      background: #c6f36b;
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .worker .account-action {
+      color: #092a30;
+      background: #9de8d5;
+    }
+
+    .login-note {
+      margin: 22px 0 0;
+      color: rgba(255,255,255,.64);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .login-note a {
+      color: #c6f36b;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    @media (max-width: 920px) {
+      .register-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .register-proof {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .register-shell {
+        padding: 22px 18px 36px;
+      }
+
+      .register-nav {
+        align-items: flex-start;
+        margin-bottom: 44px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-copy h1 {
+        font-size: 54px;
+        letter-spacing: -3px;
+      }
+
+      .register-proof {
+        grid-template-columns: 1fr;
+      }
+
+      .choice-panel {
+        border-radius: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="register-shell">
+    <nav class="register-nav">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">J</span>
+        <span>Job<span>Ease</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html#services">Services</a>
+        <a href="login.html">Login</a>
+      </div>
+    </nav>
+
+    <section class="register-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> Create your access</p>
+        <h1>Register for a<br><em>smarter</em> service network.</h1>
+        <p>Join JobEase as a customer to post jobs and book urgent help, or register as a worker to receive verified opportunities and manage your earnings.</p>
+
+        <div class="register-proof">
+          <div class="proof-card"><strong>180+</strong><span>Services and job categories</span></div>
+          <div class="proof-card"><strong>OTP</strong><span>Protected quick bookings</span></div>
+          <div class="proof-card"><strong>KYC</strong><span>Worker verification ready</span></div>
+        </div>
+      </div>
+
+      <div class="choice-panel">
+        <div class="panel-top">
+          <h2>Choose account type</h2>
+          <p>Select the path that matches what you want to do today.</p>
+        </div>
+
+        <div class="account-cards">
+          <article class="account-card">
+            <span class="account-icon">⌂</span>
+            <h3>Register as Customer</h3>
+            <p>Post service requests, use quick booking, track job status, and get matched with suitable professionals.</p>
+            <ul>
+              <li>Post jobs with service, location, and budget</li>
+              <li>Quick booking with arrival OTP</li>
+              <li>Automatic worker assignment</li>
+            </ul>
+            <a class="account-action" href="login.html">Continue as customer <span>↗</span></a>
+          </article>
+
+          <article class="account-card worker">
+            <span class="account-icon">⚒</span>
+            <h3>Register as Worker</h3>
+            <p>Create your professional profile and join the JobEase worker network for service and job opportunities.</p>
+            <ul>
+              <li>Select your profession and city</li>
+              <li>Share experience and service details</li>
+              <li>Get ready for admin verification</li>
+            </ul>
+            <a class="account-action" href="register-worker.html">Create worker profile <span>↗</span></a>
+          </article>
+        </div>
+
+        <p class="login-note">Already have an account? <a href="login.html">Log in here</a></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="chatbot.js"></script>
+</body>
+</html>

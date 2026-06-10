@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | JobEase</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --primary: #c6f36b;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --bg: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-family: Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 18px clamp(20px, 6vw, 82px); color: #fff; background: #172033; }
+    .brand { color: #fff; font-size: 23px; font-weight: 800; text-decoration: none; }
+    main { width: min(100% - 36px, 520px); margin: 60px auto; }
+    h1 { margin: 0 0 9px; font-size: 32px; letter-spacing: -1px; }
+    .subtitle { margin: 0 0 30px; color: var(--muted); font-size: 15px; }
+    form { display: grid; gap: 15px; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    input { border: 1px solid var(--line); border-radius: 8px; outline: 0; padding: 11px 12px; color: var(--ink); background: #fff; font: inherit; }
+    input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(249,115,22,.12); }
+    .error { color: #b42318; font-size: 13px; font-weight: 700; display: none; margin-top: 9px; }
+    button { border: 0; border-radius: 8px; padding: 11px 14px; color: #fff; background: var(--primary); cursor: pointer; font-weight: 800; }
+    button:hover { background: #aee453; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .success { display: none; text-align: center; padding: 30px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 13px; }
+    .success h2 { color: #1e40af; margin: 0 0 15px; }
+    .success p { color: var(--muted); margin: 0; }
+    .success a { display: inline-block; margin-top: 20px; padding: 11px 14px; background: var(--primary); color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700; }
+    .login-link { text-align: center; margin-top: 20px; font-size: 14px; }
+    .login-link a { color: var(--primary); text-decoration: none; font-weight: 700; }
+  </style>
+  <link rel="stylesheet" href="futuristic-ui.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">JobEase</a>
+  </header>
+  <main>
+    <h1>Create account</h1>
+    <p class="subtitle">Register as a customer to post jobs and book services.</p>
+    
+    <form id="customer-registration-form">
+      <label>
+        Full name
+        <input type="text" name="name" placeholder="Enter your full name" required>
+      </label>
+      <label>
+        Email address
+        <input type="email" name="email" placeholder="Enter your email" required>
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" placeholder="Minimum 6 characters" minlength="6" required>
+      </label>
+      <label>
+        Confirm password
+        <input type="password" name="confirmPassword" placeholder="Enter password again" minlength="6" required>
+      </label>
+      <p class="error" id="registration-error"></p>
+      <button type="submit">Create account</button>
+      <div class="login-link">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </form>
+
+    <div class="success" id="registration-success">
+      <h2>Registration successful!</h2>
+      <p>Your account has been created. You can now post jobs and book services.</p>
+      <a href="dashboard.html">Go to dashboard</a>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("customer-registration-form");
+    const success = document.getElementById("registration-success");
+    const registrationError = document.getElementById("registration-error");
+    const backendBase = location.protocol === "file:" ? "http://localhost:3000" : "";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const name = document.querySelector('input[name="name"]').value.trim();
+      const email = document.querySelector('input[name="email"]').value.trim().toLowerCase();
+      const password = document.querySelector('input[name="password"]').value;
+      const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+
+      if (password !== confirmPassword) {
+        document.querySelector('input[name="confirmPassword"]').setCustomValidity("Passwords do not match.");
+        document.querySelector('input[name="confirmPassword"]').reportValidity();
+        return;
+      }
+
+      document.querySelector('input[name="confirmPassword"]').setCustomValidity("");
+      registrationError.style.display = "none";
+      
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Creating account...";
+
+      try {
+        const response = await fetch(`${backendBase}/api/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password, role: "customer" })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "Registration failed");
+        
+        localStorage.setItem("jobeaseToken", result.token);
+        localStorage.setItem("jobeaseRole", "customer");
+        localStorage.setItem("jobeaseUser", JSON.stringify(result.user));
+        
+        form.style.display = "none";
+        success.style.display = "block";
+      } catch (err) {
+        const message = err.message === "Failed to fetch"
+          ? "Cannot reach the backend. Make sure http://localhost:3000 is running."
+          : err.message || "Unable to register. Please try again.";
+        registrationError.textContent = message;
+        registrationError.style.display = "block";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Create account";
+      }
+    });
+  </script>
+  <script src="chatbot.js"></script>
+</body>
+</html>
