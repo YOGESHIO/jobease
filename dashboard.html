@@ -117,8 +117,33 @@
     .pay-card { border: 2px solid var(--line); border-radius: 12px; padding: 20px 14px; text-align: center; cursor: pointer; background: #fff; font-weight: 700; font-size: 14px; transition: border-color .15s, background .15s; }
     .pay-card:hover { border-color: var(--primary); background: #f5ffe2; }
     .pay-card.selected { border-color: #15803d; background: #f0fdf4; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .detail-grid { grid-template-columns: 1fr; } .pay-options { grid-template-columns: 1fr; } }
-    @media (max-width: 520px) { .quick-grid { grid-template-columns: 1fr; } .full { grid-column: auto; } .dash-tab { padding: 9px 13px; font-size: 13px; } }
+    /* ── Admin dashboard ─────────────────────────────────────────────── */
+    .adm-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; margin: 18px 0; }
+    .adm-stat-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.05); transition: box-shadow .15s; }
+    .adm-stat-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+    .adm-stat-card.adm-stat-highlight { border-color: #86efac; background: #f0fdf4; }
+    .adm-stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .adm-stat-val { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1.1; }
+    .adm-stat-lbl { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+    .adm-alert { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 4px; font-size: 14px; }
+    .adm-badge { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .adm-badge.badge-ok       { background: #dcfce7; color: #15803d; }
+    .adm-badge.badge-warn     { background: #fef3c7; color: #92400e; }
+    .adm-badge.badge-inactive { background: #fee2e2; color: #b91c1c; }
+    .adm-badge.badge-busy     { background: #dbeafe; color: #1d4ed8; }
+    .adm-badge.badge-info     { background: #e0f2fe; color: #0369a1; }
+    .adm-badge.badge-purple   { background: #ede9fe; color: #7c3aed; }
+    .adm-badge.badge-muted    { background: #f1f5f9; color: #64748b; }
+    .adm-tab-count { font-size: 11px; background: #e2e8f0; color: #475569; border-radius: 9px; padding: 1px 6px; margin-left: 3px; font-weight: 700; }
+    .adm-tab-badge { font-size: 11px; background: #ef4444; color: #fff; border-radius: 9px; padding: 1px 6px; margin-left: 2px; font-weight: 700; }
+    .adm-search { width: 100%; max-width: 340px; border: 1px solid var(--line); border-radius: 8px; padding: 9px 14px; font-size: 14px; color: var(--ink); background: #fff; outline: 0; display: block; }
+    .adm-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(86,169,145,.14); }
+    .adm-subfilter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .adm-filter-btn { border: 1px solid var(--line); border-radius: 7px; padding: 6px 14px; background: #f8fafc; color: var(--muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s; }
+    .adm-filter-btn:hover { background: #fff; color: var(--ink); border-color: var(--primary); }
+    .adm-filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .detail-grid { grid-template-columns: 1fr; } .pay-options { grid-template-columns: 1fr; } .adm-stats-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .quick-grid { grid-template-columns: 1fr; } .full { grid-column: auto; } .dash-tab { padding: 9px 13px; font-size: 13px; } .adm-stats-grid { grid-template-columns: 1fr; } }
   </style>
   <link rel="stylesheet" href="futuristic-ui.css">
 </head>
@@ -212,125 +237,356 @@
 
     let adminWorkers = [];
     let adminJobs = [];
-    async function renderAdmin() {
-      const [workersRes, jobsRes, usersRes] = await Promise.all([
-          fetch(`${backendBase}/api/workers`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } }),
-          fetch(`${backendBase}/api/jobs`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } }),
-          fetch(`${backendBase}/api/users`, { headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` } })
-        ]);
-        const workersResult = await workersRes.json();
-        const jobsResult = await jobsRes.json();
-        const usersResult = await usersRes.json();
-        if (!workersRes.ok || !jobsRes.ok || !usersRes.ok) {
+    async function renderAdmin(activeTab = "overview") {
+      const token = localStorage.getItem("jobeaseToken");
+      const hdr = { Authorization: `Bearer ${token}` };
+      const [workersRes, jobsRes, usersRes, qbRes] = await Promise.all([
+        fetch(`${backendBase}/api/workers`,       { headers: hdr }),
+        fetch(`${backendBase}/api/jobs`,          { headers: hdr }),
+        fetch(`${backendBase}/api/users`,         { headers: hdr }),
+        fetch(`${backendBase}/api/quick-bookings`,{ headers: hdr })
+      ]);
+      if (!workersRes.ok || !jobsRes.ok || !usersRes.ok) {
         document.getElementById("role-content").innerHTML = `<section class="panel"><h2 class="panel-title">Unable to load admin information</h2></section>`;
         return;
       }
-      adminWorkers = workersResult.workers;
-        adminJobs = jobsResult.jobs || [];
-        const adminCustomers = usersResult.users || [];
-      const workers = adminWorkers;
-      const pendingJobs = adminJobs.filter((job) => !job.worker_id && job.status !== "Completed");
-      const assignedJobs = adminJobs.filter((job) => job.worker_id || job.status !== "Finding a worker");
-      document.getElementById("role-content").innerHTML = `
-        <section class="panel">
-          <h2 class="panel-title">Registered workers</h2>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Name</th><th>Service</th><th>City</th><th>Rating</th><th>Status</th><th>Jobs</th><th>Actions</th></tr></thead>
-              <tbody>
-                ${workers.map((worker) => `
-                  <tr style="${!worker.active ? 'opacity:0.55;' : ''}">
-                    <td>${worker.name}</td>
-                    <td>${worker.service}</td>
-                    <td>${worker.city}</td>
-                    <td>★ ${worker.rating}</td>
-                    <td>
-                      ${!worker.active
-                        ? `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#fee2e2;color:#b91c1c;">Inactive</span>`
-                        : !worker.verified
-                          ? `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#fef3c7;color:#92400e;">⏳ Unverified</span>`
-                          : worker.available
-                            ? `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#dcfce7;color:#15803d;">✓ Available</span>`
-                            : `<span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#dbeafe;color:#1d4ed8;">Busy</span>`}
-                    </td>
-                    <td>${worker.completedJobs}</td>
-                    <td>
-                      <div class="act-menu">
-                        <button class="act-menu-btn">Actions</button>
-                        <div class="act-dropdown">
-                          <button onclick="showWorker('${worker.id}')">View Details</button>
-                          <button ${worker.available && pendingJobs.length ? `onclick="showAssignModal('${worker.id}')"` : "disabled style='opacity:.45;cursor:not-allowed;'"}>Assign Job</button>
-                          <hr>
-                          ${!worker.verified ? `<button class="dd-green" onclick="verifyWorker('${worker.id}','${worker.name}')">✓ Verify Worker</button>` : `<span style="display:block;padding:10px 14px;font-size:12px;color:#15803d;">✓ Verified</span>`}
-                          <button class="${worker.active ? 'dd-danger' : 'dd-green'}" onclick="toggleWorkerStatus('${worker.id}',${!worker.active})">${worker.active ? "Deactivate" : "Activate"}</button>
-                          <button class="dd-purple" onclick="resetUserPassword('${worker.userId}','${worker.name}')">Reset Password</button>
-                          <hr>
-                          <button class="dd-danger" onclick="deleteWorker('${worker.id}')">Delete Account</button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>`).join("") || `<tr><td colspan="7">No registered workers.</td></tr>`}
-              </tbody>
-            </table>
+      adminWorkers = (await workersRes.json()).workers || [];
+      adminJobs    = (await jobsRes.json()).jobs || [];
+      const adminCustomers = (await usersRes.json()).users || [];
+      const adminQB = qbRes.ok ? ((await qbRes.json()).bookings || []) : [];
+
+      // ── derived stats ──────────────────────────────────────────────────────
+      const totalRevenue = adminJobs.filter(j => /^Payment/i.test(j.status))
+        .reduce((s, j) => s + Math.max(0, Number(j.amount) - Number(j.commission || 0)), 0);
+      const qbRevenue = adminQB.filter(q => /^Payment/i.test(q.status))
+        .reduce((s, q) => s + Math.max(0, Number(q.starting_charge) - Number(q.commission || 0)), 0);
+      const activeJobs = adminJobs.filter(j => ["Worker Accepted","Work Started","Worker Notified","Worker assigned"].includes(j.status));
+      const pendingJobs = adminJobs.filter(j => j.status === "Pending Assignment" || j.status === "Finding a worker");
+
+      // ── status badge helper ────────────────────────────────────────────────
+      function workerBadge(w) {
+        if (!w.active) return `<span class="adm-badge badge-inactive">Inactive</span>`;
+        if (!w.verified) return `<span class="adm-badge badge-warn">⏳ Unverified</span>`;
+        if (w.available) return `<span class="adm-badge badge-ok">✓ Available</span>`;
+        return `<span class="adm-badge badge-busy">Busy</span>`;
+      }
+      function jobBadge(status) {
+        const s = status || "";
+        if (/^Payment/i.test(s)) return `<span class="adm-badge badge-ok">${s}</span>`;
+        if (s === "Work Started")  return `<span class="adm-badge badge-busy">Work Started</span>`;
+        if (s === "Worker Accepted" || s === "Worker assigned") return `<span class="adm-badge badge-info">Assigned</span>`;
+        if (s === "Work Completed") return `<span class="adm-badge badge-purple">Completed</span>`;
+        if (s === "Worker Notified") return `<span class="adm-badge badge-warn">Notified</span>`;
+        return `<span class="adm-badge badge-muted">${s}</span>`;
+      }
+
+      // ── tab definitions ────────────────────────────────────────────────────
+      const unverifiedCount = adminWorkers.filter(w => w.active && !w.verified).length;
+      const tabs = [
+        { id: "overview",  label: "Overview" },
+        { id: "workers",   label: `Workers <span class="adm-tab-count">${adminWorkers.length}</span>${unverifiedCount ? ` <span class="adm-tab-badge">${unverifiedCount}</span>` : ""}` },
+        { id: "customers", label: `Customers <span class="adm-tab-count">${adminCustomers.length}</span>` },
+        { id: "jobs",      label: `Jobs <span class="adm-tab-count">${adminJobs.length}</span>` },
+        { id: "quickbook", label: `Quick Bookings <span class="adm-tab-count">${adminQB.length}</span>` }
+      ];
+
+      // ── OVERVIEW ──────────────────────────────────────────────────────────
+      const overviewHTML = `
+        <div class="adm-stats-grid">
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#eff6ff;color:#2563eb;">👷</div>
+            <div>
+              <div class="adm-stat-val">${adminWorkers.length}</div>
+              <div class="adm-stat-lbl">Total Workers</div>
+            </div>
           </div>
-        </section>
-        <section class="panel">
-          <h2 class="panel-title">Registered customers</h2>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Name</th><th>Email</th><th>Jobs</th><th>Active</th><th>Joined</th><th>Action</th></tr></thead>
-              <tbody>
-                ${adminCustomers.length ? adminCustomers.map((c) => `
-                  <tr>
-                    <td>${c.name}</td>
-                    <td>${c.email}</td>
-                    <td>${c.jobsCount}</td>
-                    <td>${c.active?"Yes":"No"}</td>
-                    <td>${new Date(c.createdAt).toLocaleString()}</td>
-                    <td><button class="action" style="background:#6366f1;" onclick="resetUserPassword('${c.id}','${c.name}')">Reset Pwd</button></td>
-                  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;">No customers found.</td></tr>`}
-              </tbody>
-            </table>
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#f0fdf4;color:#15803d;">✓</div>
+            <div>
+              <div class="adm-stat-val">${adminWorkers.filter(w=>w.active&&w.verified).length}</div>
+              <div class="adm-stat-lbl">Active & Verified</div>
+            </div>
           </div>
-        </section>
-        <section class="panel">
-          <h2 class="panel-title">Pending job assignments</h2>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Job ID</th><th>Title</th><th>Service</th><th>Location</th><th>Status</th><th>Budget</th></tr></thead>
-              <tbody>
-                ${pendingJobs.length ? pendingJobs.map((job) => `
-                  <tr>
-                    <td>${job.id}</td>
-                    <td>${job.title}</td>
-                    <td>${job.category}</td>
-                    <td>${job.location}</td>
-                    <td>${job.status}</td>
-                    <td>₹${job.amount}</td>
-                  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;">No pending job assignments.</td></tr>`}
-              </tbody>
-            </table>
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#fffbeb;color:#b45309;">⏳</div>
+            <div>
+              <div class="adm-stat-val">${unverifiedCount}</div>
+              <div class="adm-stat-lbl">Awaiting Verification</div>
+            </div>
           </div>
-        </section>
-        <section class="panel">
-          <h2 class="panel-title">Assigned jobs</h2>
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#fdf4ff;color:#9333ea;">👥</div>
+            <div>
+              <div class="adm-stat-val">${adminCustomers.length}</div>
+              <div class="adm-stat-lbl">Customers</div>
+            </div>
+          </div>
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#fff1f2;color:#e11d48;">📋</div>
+            <div>
+              <div class="adm-stat-val">${adminJobs.length}</div>
+              <div class="adm-stat-lbl">Total Jobs</div>
+            </div>
+          </div>
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#f0fdf4;color:#15803d;">⚡</div>
+            <div>
+              <div class="adm-stat-val">${activeJobs.length}</div>
+              <div class="adm-stat-lbl">Active Jobs</div>
+            </div>
+          </div>
+          <div class="adm-stat-card">
+            <div class="adm-stat-icon" style="background:#eff6ff;color:#2563eb;">🚀</div>
+            <div>
+              <div class="adm-stat-val">${adminQB.length}</div>
+              <div class="adm-stat-lbl">Quick Bookings</div>
+            </div>
+          </div>
+          <div class="adm-stat-card adm-stat-highlight">
+            <div class="adm-stat-icon" style="background:#f0fdf4;color:#15803d;">₹</div>
+            <div>
+              <div class="adm-stat-val">₹${(totalRevenue + qbRevenue).toLocaleString("en-IN")}</div>
+              <div class="adm-stat-lbl">Platform Revenue</div>
+            </div>
+          </div>
+        </div>
+        ${unverifiedCount ? `
+        <div class="adm-alert">
+          <span>⚠️ <strong>${unverifiedCount} worker${unverifiedCount > 1 ? "s" : ""}</strong> awaiting verification — go to the Workers tab to verify them.</span>
+          <button class="action" style="padding:6px 14px;font-size:13px;" onclick="renderAdmin('workers')">Go to Workers</button>
+        </div>` : ""}
+        <section class="panel" style="margin-top:18px;">
+          <h2 class="panel-title">Recent Jobs</h2>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Job ID</th><th>Title</th><th>Service</th><th>Worker ID</th><th>Status</th><th>Budget</th></tr></thead>
-              <tbody>
-                ${assignedJobs.length ? assignedJobs.map((job) => `
-                  <tr>
-                    <td>${job.id}</td>
-                    <td>${job.title}</td>
-                    <td>${job.category}</td>
-                    <td>${job.worker_id || "-"}</td>
-                    <td>${job.status}</td>
-                    <td>₹${job.amount}</td>
-                  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;">No assigned jobs yet.</td></tr>`}
+              <thead><tr><th>Title</th><th>Customer</th><th>Worker</th><th>Location</th><th>Status</th><th>Amount</th></tr></thead>
+              <tbody>${adminJobs.slice(0,8).map(j=>`
+                <tr>
+                  <td>${j.title}<div class="ts">${fmtDate(j.created_at)}</div></td>
+                  <td>${j.customerName||"—"}</td>
+                  <td>${j.workerName||`<span style="color:var(--muted);">Unassigned</span>`}</td>
+                  <td>${j.location}</td>
+                  <td>${jobBadge(j.status)}</td>
+                  <td>₹${Number(j.amount).toLocaleString("en-IN")}</td>
+                </tr>`).join("")||`<tr><td colspan="6" style="text-align:center;color:var(--muted);">No jobs yet.</td></tr>`}
               </tbody>
             </table>
           </div>
         </section>`;
+
+      // ── WORKERS ───────────────────────────────────────────────────────────
+      const workersHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <input id="adm-worker-search" class="adm-search" placeholder="Search by name, service or city…" oninput="adminFilterWorkers()" />
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="adm-filter-btn active" data-wf="all"    onclick="adminSetWorkerFilter(this,'all')">All</button>
+            <button class="adm-filter-btn"         data-wf="active"   onclick="adminSetWorkerFilter(this,'active')">Active</button>
+            <button class="adm-filter-btn"         data-wf="unverified" onclick="adminSetWorkerFilter(this,'unverified')">Unverified</button>
+            <button class="adm-filter-btn"         data-wf="inactive" onclick="adminSetWorkerFilter(this,'inactive')">Inactive</button>
+          </div>
+        </div>
+        <section class="panel" style="margin-top:0;">
+          <div class="table-wrap">
+            <table id="adm-workers-table">
+              <thead><tr><th>Name</th><th>Service</th><th>City</th><th>Rating</th><th>Jobs Done</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody>${adminWorkers.map(w=>`
+                <tr data-wname="${w.name.toLowerCase()}" data-wservice="${(w.service||"").toLowerCase()}" data-wcity="${(w.city||"").toLowerCase()}" data-wactive="${w.active}" data-wverified="${w.verified}" style="${!w.active?'opacity:0.6;':''}">
+                  <td><strong>${w.name}</strong><div class="ts">${w.email||""}</div></td>
+                  <td>${w.service}</td>
+                  <td>${w.city}</td>
+                  <td><span style="color:#f59e0b;font-weight:700;">★ ${w.rating}</span></td>
+                  <td>${w.completedJobs}</td>
+                  <td>${workerBadge(w)}</td>
+                  <td>
+                    <div class="act-menu">
+                      <button class="act-menu-btn">Actions ▾</button>
+                      <div class="act-dropdown">
+                        <button onclick="showWorker('${w.id}')">👁 View Details</button>
+                        <button ${w.available&&pendingJobs.length?`onclick="showAssignModal('${w.id}')"`:"disabled style='opacity:.45;cursor:not-allowed;'"}>📋 Assign Job</button>
+                        <hr>
+                        ${!w.verified?`<button class="dd-green" onclick="verifyWorker('${w.id}','${w.name}')">✓ Verify Worker</button>`:`<span style="display:block;padding:8px 14px;font-size:12px;color:#15803d;font-weight:600;">✓ Verified</span>`}
+                        <button class="${w.active?'dd-danger':'dd-green'}" onclick="toggleWorkerStatus('${w.id}',${!w.active})">${w.active?"⛔ Deactivate":"✅ Activate"}</button>
+                        <button class="dd-purple" onclick="resetUserPassword('${w.userId}','${w.name}')">🔑 Reset Password</button>
+                        <hr>
+                        <button class="dd-danger" onclick="deleteWorker('${w.id}')">🗑 Delete Account</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>`).join("")||`<tr><td colspan="7" style="text-align:center;color:var(--muted);">No workers found.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </section>`;
+
+      // ── CUSTOMERS ─────────────────────────────────────────────────────────
+      const customersHTML = `
+        <input id="adm-cust-search" class="adm-search" placeholder="Search customers by name or email…" oninput="adminFilterCustomers()" style="margin-bottom:12px;"/>
+        <section class="panel" style="margin-top:0;">
+          <div class="table-wrap">
+            <table id="adm-customers-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Jobs</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
+              <tbody>${adminCustomers.length?adminCustomers.map(c=>`
+                <tr data-cname="${c.name.toLowerCase()}" data-cemail="${c.email.toLowerCase()}">
+                  <td><strong>${c.name}</strong></td>
+                  <td>${c.email}</td>
+                  <td>${c.jobsCount}</td>
+                  <td>${c.active?`<span class="adm-badge badge-ok">Active</span>`:`<span class="adm-badge badge-inactive">Inactive</span>`}</td>
+                  <td class="ts">${fmtDate(c.createdAt)}</td>
+                  <td><button class="action" style="background:#6366f1;padding:6px 12px;" onclick="resetUserPassword('${c.id}','${c.name}')">🔑 Reset Pwd</button></td>
+                </tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--muted);">No customers found.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </section>`;
+
+      // ── JOBS ──────────────────────────────────────────────────────────────
+      function jobRows(filter) {
+        const filtered = filter === "all" ? adminJobs
+          : filter === "pending"  ? adminJobs.filter(j=>j.status==="Pending Assignment"||j.status==="Finding a worker"||j.status==="Worker Notified")
+          : filter === "active"   ? adminJobs.filter(j=>["Worker Accepted","Work Started","Worker assigned"].includes(j.status))
+          : filter === "done"     ? adminJobs.filter(j=>j.status==="Work Completed")
+          : adminJobs.filter(j=>/^Payment/i.test(j.status));
+        return filtered.length ? filtered.map(j=>`
+          <tr>
+            <td><strong>${j.title}</strong><div class="ts">${j.id}</div></td>
+            <td>${j.category}</td>
+            <td>${j.location}</td>
+            <td>${j.customerName||"—"}</td>
+            <td>${j.workerName||`<span style="color:var(--muted);">Unassigned</span>`}</td>
+            <td>${jobBadge(j.status)}</td>
+            <td>₹${Number(j.amount).toLocaleString("en-IN")}</td>
+          </tr>`).join("")
+          : `<tr><td colspan="7" style="text-align:center;color:var(--muted);">No jobs in this category.</td></tr>`;
+      }
+      const jobsHTML = `
+        <div class="adm-subfilter" id="adm-job-filters">
+          ${[["all","All"],["pending","Pending"],["active","Active"],["done","Completed"],["paid","Paid"]].map(([v,l],i)=>`
+            <button class="adm-filter-btn${i===0?' active':''}" data-jf="${v}" onclick="adminSetJobFilter(this,'${v}')">${l}</button>`).join("")}
+        </div>
+        <section class="panel" style="margin-top:8px;">
+          <div class="table-wrap">
+            <table id="adm-jobs-table">
+              <thead><tr><th>Title</th><th>Service</th><th>Location</th><th>Customer</th><th>Worker</th><th>Status</th><th>Amount</th></tr></thead>
+              <tbody id="adm-jobs-tbody">${jobRows("all")}</tbody>
+            </table>
+          </div>
+        </section>`;
+
+      // ── QUICK BOOKINGS ────────────────────────────────────────────────────
+      function qbBadge(s) {
+        if (/^Payment/i.test(s)) return `<span class="adm-badge badge-ok">${s}</span>`;
+        if (s==="Work started")  return `<span class="adm-badge badge-busy">Work Started</span>`;
+        if (s==="Worker assigned") return `<span class="adm-badge badge-info">Assigned</span>`;
+        if (s==="Work completed") return `<span class="adm-badge badge-purple">Completed</span>`;
+        if (s==="Worker Notified") return `<span class="adm-badge badge-warn">Notified</span>`;
+        if (s==="Cancelled") return `<span class="adm-badge badge-inactive">Cancelled</span>`;
+        return `<span class="adm-badge badge-muted">${s}</span>`;
+      }
+      const quickBookHTML = `
+        <section class="panel" style="margin-top:0;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Service</th><th>Location</th><th>Customer</th><th>Worker</th><th>Status</th><th>Charge</th><th>Posted</th><th>Action</th></tr></thead>
+              <tbody>${adminQB.length?adminQB.map(b=>`
+                <tr>
+                  <td>${b.service}</td>
+                  <td>${b.location}</td>
+                  <td>${b.customerName||"—"}</td>
+                  <td>${b.workerName||`<span style="color:var(--muted);">None</span>`}</td>
+                  <td>${qbBadge(b.status)}</td>
+                  <td>₹${Number(b.starting_charge).toLocaleString("en-IN")}</td>
+                  <td class="ts">${fmtDate(b.created_at)}</td>
+                  <td>${["Searching","Worker Notified","Worker assigned"].includes(b.status)?`<button class="action danger" style="padding:5px 10px;font-size:12px;" onclick="adminCancelQB('${b.id}')">Cancel</button>`:"—"}</td>
+                </tr>`).join(""):`<tr><td colspan="8" style="text-align:center;color:var(--muted);">No quick bookings yet.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </section>`;
+
+      // ── RENDER ────────────────────────────────────────────────────────────
+      document.getElementById("role-content").innerHTML = `
+        <nav class="dash-tabs" id="adm-tabs" style="margin-top:18px;">
+          ${tabs.map(t=>`<button class="dash-tab${activeTab===t.id?' active':''}" data-atab="${t.id}">${t.label}</button>`).join("")}
+        </nav>
+        <div id="adm-tab-overview"  style="display:${activeTab==='overview' ?'block':'none'};">${overviewHTML}</div>
+        <div id="adm-tab-workers"   style="display:${activeTab==='workers'  ?'block':'none'};">${workersHTML}</div>
+        <div id="adm-tab-customers" style="display:${activeTab==='customers'?'block':'none'};">${customersHTML}</div>
+        <div id="adm-tab-jobs"      style="display:${activeTab==='jobs'     ?'block':'none'};">${jobsHTML}</div>
+        <div id="adm-tab-quickbook" style="display:${activeTab==='quickbook'?'block':'none'};">${quickBookHTML}</div>`;
+
+      document.getElementById("adm-tabs").addEventListener("click", e => {
+        const btn = e.target.closest(".dash-tab[data-atab]");
+        if (!btn) return;
+        switchAdminTab(btn.dataset.atab);
+      });
+    }
+
+    function switchAdminTab(tabId) {
+      ["overview","workers","customers","jobs","quickbook"].forEach(t => {
+        const el = document.getElementById(`adm-tab-${t}`);
+        if (el) el.style.display = t === tabId ? "block" : "none";
+        const btn = document.querySelector(`.dash-tab[data-atab="${t}"]`);
+        if (btn) btn.classList.toggle("active", t === tabId);
+      });
+    }
+
+    function adminFilterWorkers() {
+      const q = (document.getElementById("adm-worker-search")?.value || "").toLowerCase();
+      const activeFilter = document.querySelector(".adm-filter-btn.active[data-wf]")?.dataset.wf || "all";
+      document.querySelectorAll("#adm-workers-table tbody tr[data-wname]").forEach(row => {
+        const matchQ = !q || row.dataset.wname.includes(q) || row.dataset.wservice.includes(q) || row.dataset.wcity.includes(q);
+        const active = row.dataset.wactive === "1" || row.dataset.wactive === "true";
+        const verified = row.dataset.wverified === "1" || row.dataset.wverified === "true";
+        const matchF = activeFilter === "all" || (activeFilter === "active" && active && verified)
+          || (activeFilter === "unverified" && active && !verified) || (activeFilter === "inactive" && !active);
+        row.style.display = matchQ && matchF ? "" : "none";
+      });
+    }
+
+    function adminSetWorkerFilter(btn, filter) {
+      document.querySelectorAll(".adm-filter-btn[data-wf]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      adminFilterWorkers();
+    }
+
+    function adminFilterCustomers() {
+      const q = (document.getElementById("adm-cust-search")?.value || "").toLowerCase();
+      document.querySelectorAll("#adm-customers-table tbody tr[data-cname]").forEach(row => {
+        const match = !q || row.dataset.cname.includes(q) || row.dataset.cemail.includes(q);
+        row.style.display = match ? "" : "none";
+      });
+    }
+
+    function adminSetJobFilter(btn, filter) {
+      document.querySelectorAll(".adm-filter-btn[data-jf]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tbody = document.getElementById("adm-jobs-tbody");
+      if (!tbody) return;
+      tbody.querySelectorAll("tr").forEach(r => r.style.display = "");
+      if (filter === "all") return;
+      tbody.querySelectorAll("tr[style]").forEach(r => r.style.display = "");
+      // re-render from data
+      const filtered = filter === "pending"  ? adminJobs.filter(j=>j.status==="Pending Assignment"||j.status==="Finding a worker"||j.status==="Worker Notified")
+        : filter === "active"   ? adminJobs.filter(j=>["Worker Accepted","Work Started","Worker assigned"].includes(j.status))
+        : filter === "done"     ? adminJobs.filter(j=>j.status==="Work Completed")
+        : adminJobs.filter(j=>/^Payment/i.test(j.status));
+      function jb(s){const st=s||"";if(/^Payment/i.test(st))return`<span class="adm-badge badge-ok">${st}</span>`;if(st==="Work Started")return`<span class="adm-badge badge-busy">Work Started</span>`;if(st==="Worker Accepted"||st==="Worker assigned")return`<span class="adm-badge badge-info">Assigned</span>`;if(st==="Work Completed")return`<span class="adm-badge badge-purple">Completed</span>`;if(st==="Worker Notified")return`<span class="adm-badge badge-warn">Notified</span>`;return`<span class="adm-badge badge-muted">${st}</span>`;}
+      tbody.innerHTML = filtered.length ? filtered.map(j=>`<tr><td><strong>${j.title}</strong><div class="ts">${j.id}</div></td><td>${j.category}</td><td>${j.location}</td><td>${j.customerName||"—"}</td><td>${j.workerName||`<span style="color:var(--muted);">Unassigned</span>`}</td><td>${jb(j.status)}</td><td>₹${Number(j.amount).toLocaleString("en-IN")}</td></tr>`).join("")
+        : `<tr><td colspan="7" style="text-align:center;color:var(--muted);">No jobs in this category.</td></tr>`;
+    }
+
+    async function adminCancelQB(bookingId) {
+      if (!confirm("Cancel this quick booking?")) return;
+      try {
+        const res = await fetch(`${backendBase}/api/quick-bookings/${bookingId}/cancel`, {
+          method: "PATCH", headers: { Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` }
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        renderAdmin("quickbook");
+      } catch (e) {
+        alert(e.message || "Unable to cancel booking.");
+      }
     }
 
     async function showAssignModal(workerId) {
@@ -368,7 +624,7 @@
         if (!response.ok) throw new Error(result.error);
         alert(result.message || "Worker assigned successfully.");
         document.getElementById("assign-modal").close();
-        renderAdmin();
+        renderAdmin("workers");
       } catch (error) {
         alert(error.message || "Unable to assign worker.");
       }
@@ -418,7 +674,7 @@
         });
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
-        renderAdmin();
+        renderAdmin("workers");
       } catch (e) {
         alert(e.message || "Unable to verify worker.");
       }
@@ -435,7 +691,7 @@
         });
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
-        renderAdmin();
+        renderAdmin("workers");
       } catch (e) {
         alert(e.message || `Unable to ${action} worker.`);
       }
@@ -449,7 +705,7 @@
         alert(result.error || "Unable to delete worker.");
         return;
       }
-      renderAdmin();
+      renderAdmin("workers");
     }
 
     async function renderWorker(activeTab = "jobs") {

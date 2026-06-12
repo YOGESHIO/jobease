@@ -798,10 +798,11 @@ async function handleApi(req, res, url) {
       return json(res,200,{bookings});
     }
     const [bookings]=await pool.query(
-      `SELECT qb.*, u.name AS customerName, wp.service AS workerService
+      `SELECT qb.*, cu.name AS customerName, wu.name AS workerName, wp.service AS workerService
        FROM quick_bookings qb
-       JOIN users u ON qb.customer_id=u.id
+       JOIN users cu ON qb.customer_id=cu.id
        LEFT JOIN worker_profiles wp ON qb.worker_id=wp.id
+       LEFT JOIN users wu ON wp.user_id=wu.id
        ORDER BY qb.created_at DESC`
     );
     return json(res,200,{bookings});
