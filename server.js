@@ -9,12 +9,16 @@ const ROOT = __dirname;
 const sessions = new Map();
 const mimeTypes = { ".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml",".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp" };
 
-// Lightweight services catalog used by the frontend via /api/services
+// Services catalog used by the frontend via /api/services
 const servicesCatalog = {
-  "Popular": [["Electrician",399,"ϟ"],["Plumber",399,"◒"],["House Cleaning",699,"✦"],["AC Repair",599,"❄"]],
-  "Cleaning": [["Maid",299,"⌂"],["House Cleaning",699,"✦"],["Deep Cleaning",1499,"✦"]],
-  "Repairs": [["Plumber",399,"◒"],["Electrician",399,"ϟ"],["Carpenter",499,"⚒"]],
-  "Appliances": [["AC Repair",599,"❄"],["Refrigerator Repair",499,"❄"],["Washing Machine Repair",499,"◒"]]
+  "Popular":      [["Electrician",399],["Plumber",399],["House Cleaning",699],["AC Repair",599],["Carpenter",499],["Painter",599]],
+  "Cleaning":     [["Maid",299],["House Cleaning",699],["Deep Cleaning",1499],["Bathroom Cleaning",399],["Kitchen Cleaning",599],["Sofa Cleaning",499],["Carpet Cleaning",449],["Office Cleaning",999]],
+  "Repairs":      [["Plumber",399],["Electrician",399],["Carpenter",499],["Painter",599],["Welder",599],["Mason",549],["Tile Worker",599],["POP Worker",649]],
+  "Appliances":   [["AC Repair",599],["Refrigerator Repair",499],["Washing Machine Repair",499],["TV Repair",449],["Microwave Repair",449],["Water Purifier Repair",399],["Geyser Repair",449]],
+  "Vehicles":     [["Bike Repair",349],["Bike Washing",199],["Puncture Repair",149],["Car Repair",699],["Car Washing",399],["Car Detailing",1499],["Towing Service",999],["Battery Jump Start",449]],
+  "Health & Care":[["Home Nurse",999],["Caretaker",799],["Elder Care",799],["Babysitter",699],["Ambulance Booking",999]],
+  "Professional": [["Website Developer",2999],["Graphic Designer",999],["Accountant",999],["Security Guard",799],["Resume Writing",499],["Locksmith",449],["Property Inspection",999]],
+  "Technology":   [["CCTV Installation",999],["Smart Device Setup",699],["Home Automation",1999],["AI Assistant Setup",1499],["AI Content Creation",999]]
 };
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -268,6 +272,7 @@ async function ensureJobColumns() {
   if (!names.includes("otp"))            await pool.query("ALTER TABLE jobs ADD COLUMN otp VARCHAR(6) NULL");
   if (!names.includes("work_started_at")) await pool.query("ALTER TABLE jobs ADD COLUMN work_started_at TIMESTAMP NULL");
   if (!names.includes("completed_at"))   await pool.query("ALTER TABLE jobs ADD COLUMN completed_at TIMESTAMP NULL");
+  if (!names.includes("scheduled_at"))   await pool.query("ALTER TABLE jobs ADD COLUMN scheduled_at DATETIME NULL");
   // Add job_id to reviews so one review per job is enforced
   const [rCols] = await pool.query("SHOW COLUMNS FROM reviews");
   const rNames = rCols.map(c => c.Field);
@@ -309,7 +314,7 @@ async function ensureJobNotificationTable() {
     FOREIGN KEY (worker_id) REFERENCES worker_profiles(id) ON DELETE CASCADE
   )`);
 }
-async function findEligibleWorkers(service, location = "", excludeWorkerIds = []) {
+async function findEligibleWorkers(service, location = "", excludeWorkerIds = [], scheduledAt = null) {
   const svc = service.toLowerCase();
   const svcParam = `%${svc}%`;
   const loc = location.toLowerCase();
@@ -318,6 +323,30 @@ async function findEligibleWorkers(service, location = "", excludeWorkerIds = []
   const params = [svcParam, svc];
   if (locParam) params.push(locParam, loc);
 
+  // Conflict check differs between ASAP and scheduled jobs
+  let conflictClause;
+  if (scheduledAt) {
+    // Scheduled job: block worker if they have an active ASAP job OR
+    // another scheduled job within ±4 hours of the requested time
+    conflictClause = `AND NOT EXISTS (
+      SELECT 1 FROM jobs cj
+      WHERE cj.worker_id = wp.id
+        AND cj.status IN ('Worker Accepted','Work Started','Worker assigned','Worker Notified')
+        AND (
+          (cj.scheduled_at IS NULL AND cj.status IN ('Worker Accepted','Work Started'))
+          OR (cj.scheduled_at IS NOT NULL AND ABS(TIMESTAMPDIFF(HOUR, cj.scheduled_at, ?)) < 4)
+        )
+    )`;
+    params.push(scheduledAt);
+  } else {
+    // ASAP job: block worker only if they currently have an active job
+    conflictClause = `AND NOT EXISTS (
+      SELECT 1 FROM jobs cj
+      WHERE cj.worker_id = wp.id
+        AND cj.status IN ('Worker Accepted','Work Started','Worker assigned')
+    )`;
+  }
+
   const [workers] = await pool.execute(
     `SELECT wp.id,wp.user_id AS userId,wp.phone,wp.city,wp.service,wp.experience,wp.description,wp.rating,wp.completed_jobs AS completedJobs,COALESCE(wp.available,TRUE) AS available,wp.verified,u.name,u.email
      FROM worker_profiles wp JOIN users u ON u.id=wp.user_id
@@ -325,11 +354,7 @@ async function findEligibleWorkers(service, location = "", excludeWorkerIds = []
        AND COALESCE(wp.available,TRUE)=TRUE
        AND (LOWER(wp.service) LIKE ? OR ? LIKE CONCAT('%',LOWER(wp.service),'%'))
        ${locParam ? `AND (LOWER(wp.city) LIKE ? OR ? LIKE CONCAT('%',LOWER(wp.city),'%'))` : ""}
-       AND NOT EXISTS (
-         SELECT 1 FROM jobs j
-         WHERE j.worker_id = wp.id
-           AND j.status IN ('Worker Accepted','Work Started','Worker assigned')
-       )
+       ${conflictClause}
        AND NOT EXISTS (
          SELECT 1 FROM job_notifications jn
          WHERE jn.worker_id = wp.id
@@ -343,10 +368,10 @@ async function findEligibleWorkers(service, location = "", excludeWorkerIds = []
 }
 async function notifyNextWorker(jobId, excludeWorkerIds = []) {
   await ensureJobNotificationTable();
-  const [jobs] = await pool.execute("SELECT id,category,location FROM jobs WHERE id=? LIMIT 1", [jobId]);
+  const [jobs] = await pool.execute("SELECT id,category,location,scheduled_at FROM jobs WHERE id=? LIMIT 1", [jobId]);
   const job = jobs[0];
   if (!job) return null;
-  const workers = await findEligibleWorkers(job.category, job.location, excludeWorkerIds);
+  const workers = await findEligibleWorkers(job.category, job.location, excludeWorkerIds, job.scheduled_at);
   const worker = workers[0];
   if (!worker) {
     await pool.execute("UPDATE jobs SET status='Pending Assignment' WHERE id=?", [jobId]);
@@ -377,7 +402,7 @@ async function handleApi(req, res, url) {
     const user=await auth(req,res,["worker"]);if(!user)return;await ensureJobNotificationTable();
     const [rows]=await pool.execute(
       `SELECT n.id,n.job_id AS jobId,n.status,n.expires_at AS expiresAt,n.created_at AS createdAt,
-              j.title,j.category,j.location,j.details,j.amount,j.commission,j.status AS jobStatus
+              j.title,j.category,j.location,j.details,j.amount,j.commission,j.status AS jobStatus,j.scheduled_at AS scheduledAt
        FROM job_notifications n
        JOIN jobs j ON j.id=n.job_id
        JOIN worker_profiles wp ON wp.id=n.worker_id
@@ -625,15 +650,24 @@ async function handleApi(req, res, url) {
   }
   if(req.method==="POST"&&url.pathname==="/api/jobs"){
     const customer=await auth(req,res,["customer"]);if(!customer)return;const data=await body(req);
-    if(!data.title||!data.category||!data.location)return error(res,400,"Please complete the job details.");
+    if(!data.title||!data.category||!data.location)return error(res,400,"Please fill in the job title, service, and location.");
     const allServices=Object.values(servicesCatalog).flat();
     const catalogMatch=allServices.find(([name])=>name.toLowerCase()===data.category.toLowerCase());
     const amount=Number(data.budget)||(catalogMatch?catalogMatch[1]:499);
     const jobId=id("JOB"),commission=Math.round(amount*.1);
-    await pool.execute("INSERT INTO jobs (id,customer_id,worker_id,title,category,location,details,amount,commission,status) VALUES (?,?,?,?,?,?,?,?,?,?)",[jobId,customer.id,null,data.title,data.category,data.location,data.details||"",amount,commission,"Pending Assignment"]);
+    // Parse and validate scheduledAt
+    let scheduledAt=null;
+    if(data.scheduledAt){
+      const dt=new Date(data.scheduledAt);
+      if(isNaN(dt.getTime()))return error(res,400,"Invalid scheduled date/time.");
+      if(dt<=new Date())return error(res,400,"Scheduled time must be in the future.");
+      scheduledAt=dt;
+    }
+    await pool.execute("INSERT INTO jobs (id,customer_id,worker_id,title,category,location,details,amount,commission,status,scheduled_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",[jobId,customer.id,null,data.title,data.category,data.location,data.details||"",amount,commission,"Pending Assignment",scheduledAt]);
     const notification=await notifyNextWorker(jobId);
     const nextStatus=notification?"Worker Notified":"Pending Assignment";
-    return json(res,201,{message:notification?"Your job has been posted and a worker has been notified.":"Your job has been posted. No matching worker is available yet.",job:{id:jobId,title:data.title,category:data.category,location:data.location,amount,commission,status:nextStatus}});
+    const schedMsg=scheduledAt?` Scheduled for ${new Date(scheduledAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}.`:"";
+    return json(res,201,{message:notification?`Job posted! A worker has been notified.${schedMsg}`:`Job posted.${schedMsg} No matching worker is currently available.`,job:{id:jobId,title:data.title,category:data.category,location:data.location,amount,commission,scheduledAt,status:nextStatus}});
   }
   if(req.method==="GET"&&url.pathname==="/api/jobs"){
     const user=await auth(req,res,["customer","worker","admin"]);if(!user)return;
@@ -641,20 +675,21 @@ async function handleApi(req, res, url) {
     if(user.role==="customer"){
       const [rows]=await pool.execute(
         `SELECT j.*,u.name AS workerName,wp.phone AS workerPhone,wp.service AS workerService,
-                EXISTS(SELECT 1 FROM reviews r WHERE r.job_id=j.id) AS reviewed
+                EXISTS(SELECT 1 FROM reviews r WHERE r.job_id=j.id) AS reviewed,
+                j.scheduled_at AS scheduledAt
          FROM jobs j
          LEFT JOIN worker_profiles wp ON j.worker_id=wp.id
          LEFT JOIN users u ON wp.user_id=u.id
-         WHERE j.customer_id=? ORDER BY j.created_at DESC`,
+         WHERE j.customer_id=? ORDER BY COALESCE(j.scheduled_at, j.created_at) DESC`,
         [user.id]);
       jobs=rows;
     } else if(user.role==="worker"){
       const [rows]=await pool.execute(
-        `SELECT j.*,cu.name AS customerName,cu.email AS customerEmail
+        `SELECT j.*,cu.name AS customerName,cu.email AS customerEmail,j.scheduled_at AS scheduledAt
          FROM jobs j
          LEFT JOIN users cu ON j.customer_id=cu.id
          WHERE j.worker_id=(SELECT id FROM worker_profiles WHERE user_id=?)
-         ORDER BY j.created_at DESC`,
+         ORDER BY COALESCE(j.scheduled_at, j.created_at) DESC`,
         [user.id]);
       jobs=rows;
     } else {

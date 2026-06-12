@@ -764,8 +764,11 @@
           } else if (/^Payment/i.test(job.status) && job.completed_at) {
             statusExtra = `<div class="ts">Paid: ${fmtDate(job.completed_at)}</div>`;
           }
+          const schedBadge = (job.scheduledAt || job.scheduled_at)
+            ? `<div style="margin-top:3px;display:inline-block;font-size:11px;background:#fef3c7;color:#92400e;padding:1px 7px;border-radius:5px;font-weight:700;">📅 ${fmtDate(job.scheduledAt||job.scheduled_at)}</div>`
+            : `<div class="ts">ASAP</div>`;
           return `<tr>
-            <td>${job.title || job.category}<div class="ts">${fmtDate(job.created_at)}</div>${job.customerName ? `<div class="ts" style="color:#2563eb;">By: ${job.customerName}</div>` : ""}</td>
+            <td>${job.title || job.category}${schedBadge}${job.customerName ? `<div class="ts" style="color:#2563eb;">By: ${job.customerName}</div>` : ""}</td>
             <td>${job.category}</td>
             <td>${job.location}</td>
             <td>₹${Number(job.amount).toLocaleString("en-IN")}</td>
@@ -1130,8 +1133,12 @@
         } else {
           actionCell = `<button class="action danger" onclick="deleteCustomerJob('${job.id}')">Delete</button>`;
         }
+        const sched = job.scheduledAt || job.scheduled_at;
         return `<tr>
-          <td>${job.title}</td>
+          <td>
+            <strong>${job.title}</strong>
+            ${sched ? `<div style="margin-top:3px;display:inline-block;font-size:11px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700;">📅 ${fmtDate(sched)}</div>` : `<div class="ts">ASAP</div>`}
+          </td>
           <td>${job.category}</td>
           <td>${job.location}</td>
           <td class="status-cell">${statusCell}</td>
@@ -1205,16 +1212,43 @@
           <section class="panel">
             <h2 class="panel-title">Post a Job</h2>
             <form class="job-form" id="customer-job-form">
-              <label>Job title<input name="title" required placeholder="Example: Fix kitchen tap"></label>
+              <label>Job title
+                <input name="title" required placeholder="Example: Fix leaking kitchen tap">
+              </label>
               <label>Service category
-                <select name="category" id="job-service-category" required>
+                <select name="category" id="job-service-category" required onchange="onJobCategoryChange()">
                   <option value="">Select service</option>
                 </select>
               </label>
-              <label>Location<input name="location" required placeholder="Enter job location"></label>
-              <label>Job details<textarea name="details" required placeholder="Describe the work needed"></textarea></label>
-              <p class="form-success" id="job-success">Job posted! We are finding a suitable worker for you.</p>
-              <button class="primary-action" type="submit">Post job</button>
+              <div id="job-starting-rate" style="display:none;padding:10px 14px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:20px;color:#15803d;">₹</span>
+                <div>
+                  <span id="job-rate-val" style="font-size:18px;font-weight:800;color:#15803d;"></span>
+                  <span id="job-rate-lbl" style="color:#374151;margin-left:6px;"></span>
+                </div>
+              </div>
+              <label>Budget (₹)
+                <input name="budget" id="job-budget" type="number" min="100" placeholder="Auto-filled from service rate — edit if needed">
+              </label>
+              <label>Location
+                <input name="location" required placeholder="Enter job location">
+              </label>
+              <label>Schedule
+                <select id="job-schedule-type" onchange="onScheduleTypeChange()">
+                  <option value="asap">As soon as possible</option>
+                  <option value="scheduled">Pick a date & time</option>
+                </select>
+              </label>
+              <div id="job-schedule-picker" style="display:none;">
+                <label>Date & Time
+                  <input type="datetime-local" name="scheduledAt" id="job-scheduled-at">
+                </label>
+              </div>
+              <label>Job details (optional)
+                <textarea name="details" placeholder="Describe the work in more detail…"></textarea>
+              </label>
+              <div id="job-post-msg" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:700;"></div>
+              <button class="primary-action" type="submit" id="job-submit-btn">Post job</button>
             </form>
           </section>
         </div>
@@ -1223,7 +1257,7 @@
             <h2 class="panel-title">My Requests</h2>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Title</th><th>Service</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+                <thead><tr><th>Title / Schedule</th><th>Service</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody id="customer-jobs"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
               </table>
             </div>
@@ -1241,23 +1275,45 @@
       });
 
       populateJobServices();
+      // Set minimum datetime to 1 hour from now
+      const minDt = new Date(Date.now() + 60*60*1000);
+      const pad = n => String(n).padStart(2,"0");
+      document.getElementById("job-scheduled-at").min =
+        `${minDt.getFullYear()}-${pad(minDt.getMonth()+1)}-${pad(minDt.getDate())}T${pad(minDt.getHours())}:${pad(minDt.getMinutes())}`;
+
       document.getElementById("customer-job-form").addEventListener("submit", async (event) => {
         event.preventDefault();
+        const btn = document.getElementById("job-submit-btn");
+        const msgBox = document.getElementById("job-post-msg");
+        btn.disabled = true; btn.textContent = "Posting…";
+        msgBox.style.display = "none";
         const data = new FormData(event.currentTarget);
+        const payload = Object.fromEntries(data.entries());
+        // Remove scheduledAt if ASAP mode
+        if (document.getElementById("job-schedule-type").value === "asap") delete payload.scheduledAt;
         try {
           const response = await fetch(`${backendBase}/api/jobs`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jobeaseToken")}` },
-            body: JSON.stringify(Object.fromEntries(data.entries()))
+            body: JSON.stringify(payload)
           });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error);
+          msgBox.textContent = result.message;
+          msgBox.style.cssText = "display:block;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:700;background:#f0fdf4;border:1px solid #86efac;color:#15803d;margin-bottom:4px;";
           event.currentTarget.reset();
-          // Switch to Track Requests and show the searching loader
-          const trackTab = document.querySelector(".dash-tab[data-tab='track']");
-          if (trackTab) trackTab.click();
+          document.getElementById("job-starting-rate").style.display = "none";
+          document.getElementById("job-schedule-picker").style.display = "none";
+          document.getElementById("job-schedule-type").value = "asap";
+          setTimeout(() => {
+            const trackTab = document.querySelector(".dash-tab[data-tab='track']");
+            if (trackTab) trackTab.click();
+          }, 1200);
         } catch (postingError) {
-          alert(postingError.message || "Unable to post your job.");
+          msgBox.textContent = postingError.message || "Unable to post your job. Please try again.";
+          msgBox.style.cssText = "display:block;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:700;background:#fff5f5;border:1px solid #fca5a5;color:#b91c1c;margin-bottom:4px;";
+        } finally {
+          btn.disabled = false; btn.textContent = "Post job";
         }
       });
       document.getElementById("quick-service").addEventListener("change", showQuickPrice);
@@ -1280,33 +1336,52 @@
       "AI Assistant Setup":1499,"AI Content Creation":999,"AI Training":1499,"CCTV Installation":999,"Smart Device Setup":699,"Home Automation":1999
     };
 
-    function showJobStartingRate() {
+    function onJobCategoryChange() {
       const service = document.getElementById("job-service-category").value;
       const box = document.getElementById("job-starting-rate");
+      const budgetInput = document.getElementById("job-budget");
+      if (!service) { box.style.display = "none"; return; }
       const rate = serviceRates[service] || 499;
-      if (!service) {
-        box.style.display = "none";
-        return;
+      document.getElementById("job-rate-val").textContent = `₹${rate}`;
+      document.getElementById("job-rate-lbl").textContent = `Estimated starting rate for ${service}`;
+      box.style.display = "flex";
+      budgetInput.value = rate;
+      budgetInput.placeholder = `₹${rate} (suggested for ${service})`;
+    }
+
+    function onScheduleTypeChange() {
+      const type = document.getElementById("job-schedule-type").value;
+      const picker = document.getElementById("job-schedule-picker");
+      picker.style.display = type === "scheduled" ? "block" : "none";
+      if (type === "scheduled") {
+        const dtInput = document.getElementById("job-scheduled-at");
+        if (!dtInput.value) {
+          // Default to tomorrow at 10am
+          const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(10, 0, 0, 0);
+          const pad = n => String(n).padStart(2,"0");
+          dtInput.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T10:00`;
+        }
+        dtInput.required = true;
+      } else {
+        document.getElementById("job-scheduled-at").required = false;
       }
-      box.innerHTML = `<strong>₹${rate}</strong>Estimated starting rate for ${service}. You can adjust your budget based on the job details.`;
-      box.style.display = "block";
     }
 
     async function populateJobServices() {
       const select = document.getElementById("job-service-category");
       try {
         const res = await fetch(`${backendBase}/api/services`);
-        if (!res.ok) throw new Error('Failed to fetch services');
+        if (!res.ok) throw new Error("Failed to fetch services");
         const data = await res.json();
         const catalog = data.catalog || {};
         Object.entries(catalog).forEach(([group, services]) => {
-          const options = services.map((s) => `<option>${s[0]}</option>`).join("");
+          const options = services.map(s => `<option value="${s[0]}">${s[0]}</option>`).join("");
           select.insertAdjacentHTML("beforeend", `<optgroup label="${group}">${options}</optgroup>`);
         });
       } catch (e) {
-        // Fallback minimal options if API is unavailable
-        select.insertAdjacentHTML('beforeend', '<option>Electrician</option><option>Plumber</option>');
-        console.error('populateJobServices error', e);
+        ["Electrician","Plumber","Carpenter","Painter","Cleaner","AC Repair"].forEach(s =>
+          select.insertAdjacentHTML("beforeend", `<option>${s}</option>`)
+        );
       }
     }
 
@@ -1505,7 +1580,11 @@
 
       const jobRows = jobNotifs.length ? jobNotifs.map(n => `
         <tr>
-          <td><span style="font-size:11px;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:5px;font-weight:700;">JOB</span> ${n.title||n.category}</td>
+          <td>
+            <span style="font-size:11px;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:5px;font-weight:700;">JOB</span>
+            <strong style="margin-left:5px;">${n.title||n.category}</strong>
+            ${n.scheduledAt ? `<div style="margin-top:4px;display:inline-block;font-size:11px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700;">📅 ${fmtDate(n.scheduledAt)}</div>` : `<div class="ts">ASAP</div>`}
+          </td>
           <td>${n.category}</td>
           <td>${n.location}</td>
           <td>₹${Number(n.amount).toLocaleString("en-IN")}</td>
@@ -1517,7 +1596,10 @@
 
       const qbRows = qbNotifs.length ? qbNotifs.map(n => `
         <tr>
-          <td><span style="font-size:11px;background:#fef9c3;color:#92400e;padding:2px 7px;border-radius:5px;font-weight:700;">QUICK</span> ${n.service}</td>
+          <td>
+            <span style="font-size:11px;background:#fef9c3;color:#92400e;padding:2px 7px;border-radius:5px;font-weight:700;">QUICK</span>
+            ${n.service}<div class="ts">ASAP</div>
+          </td>
           <td>${n.service}</td>
           <td>${n.location}</td>
           <td>₹${Number(n.amount).toLocaleString("en-IN")}</td>
